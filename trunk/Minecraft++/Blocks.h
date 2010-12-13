@@ -5,3 +5,12 @@ struct Block{
 	uint8_t saturation;
 	uint16_t light;
 };
+
+struct BlockType{
+	bool solid;
+	void* model;//To be dealt with later
+};
+
+extern map<uint16_t,BlockType> BlockTypes;
+
+void InitBlocks();
