@@ -1,4 +1,4 @@
-extern sf::Window Window;
+
 
 namespace Game {
 	bool Init();

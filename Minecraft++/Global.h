@@ -2,6 +2,7 @@
 
 //SFML
 #include <SFML/Graphics.hpp>
+#include <SFML/OpenGL.hpp>
 
 //STL
 #include <iostream>
@@ -15,6 +16,9 @@ using namespace std;
 //Our own headers
 #include "Utilities.h"
 #include "Position.h"
+#include "Rotation.h"
+#include "Graphics.h"
 #include "Blocks.h"
 #include "Chunks.h"
+#include "Player.h"
 #include "Game.h"

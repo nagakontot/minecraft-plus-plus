@@ -1,0 +1,2 @@
+extern sf::Window Window;
+
