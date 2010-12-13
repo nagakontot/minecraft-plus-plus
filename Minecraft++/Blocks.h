@@ -7,8 +7,11 @@ struct Block{
 };
 
 struct BlockType{
+	BlockType();
+	BlockType(bool _solid, uint8_t _porosity, GLuint _texture);
 	bool solid;
-	void* model;//To be dealt with later
+	uint8_t porosity;
+	GLuint texture;
 };
 
 extern map<uint16_t,BlockType> BlockTypes;
