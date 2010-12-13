@@ -1,8 +1,8 @@
 #pragma once
 
 //SFML
-#include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
+#include <SFML/Graphics.hpp>
 
 //STL
 #include <iostream>
