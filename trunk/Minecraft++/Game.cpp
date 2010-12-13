@@ -4,7 +4,7 @@
 
 bool Game::Init() {
 	InitBlocks();
-	Window.Create(sf::VideoMode(800,600,32),"Minecraft++",sf::Style::Close|sf::Style::Titlebar,sf::ContextSettings(32,0,0));
+	Window.Create(sf::VideoMode(800,600,32),"Minecraft++",sf::Style::Close|sf::Style::Titlebar,sf::ContextSettings(24,0,0));
 	return true;
 }
 bool Game::Loop() {
