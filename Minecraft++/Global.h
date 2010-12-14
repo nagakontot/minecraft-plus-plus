@@ -3,6 +3,8 @@
 //SFML
 #include <SFML/OpenGL.hpp>
 #include <SFML/Graphics.hpp>
+#include <SFML/Network.hpp>
+#include <SFML/Audio.hpp>
 
 //STL
 #include <iostream>
@@ -11,6 +13,8 @@
 #include <cmath>
 #include <map>
 #include <cstdint>
+#include <random>
+#include <functional>
 using namespace std;
 
 //Our own headers

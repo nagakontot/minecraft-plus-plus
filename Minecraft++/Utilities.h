@@ -53,8 +53,50 @@ inline double sign (double x) {
 inline double psqdis (double x1, double y1, double x2, double y2) {
 	return sqr(x1-x2)+sqr(y1-y2);
 }
-inline double random (double x) {
+inline double random(double x) {
 	return double(rand())/RAND_MAX*x;
+}
+inline uint32_t rhash(uint8_t* x, uint32_t len) {
+	uint32_t hash, i;
+	for(hash = i = 0; i < len; ++i){
+		hash += x[i];
+		hash += (hash << 10);
+		hash ^= (hash >> 6);
+	}
+	hash += (hash << 3);
+	hash ^= (hash >> 11);
+	hash += (hash << 15);
+	return hash;
+}
+template <class T1>
+inline uint32_t random(T1 s1) {
+	uint8_t x[sizeof(T1)];
+	uint32_t s = 0;
+	*(T1*)(x+s) = s1;
+	s += sizeof(T1);
+	return max(uint32_t(1),rhash(x, s));
+}
+template <class T1, class T2>
+inline uint32_t random(T1 s1, T2 s2) {
+	uint8_t x[sizeof(T1)+sizeof(T2)];
+	uint32_t s = 0;
+	*(T1*)(x+s) = s1;
+	s += sizeof(T1);
+	*(T2*)(x+s) = s2;
+	s += sizeof(T2);
+	return rhash(x, s);
+}
+template <class T1, class T2, class T3>
+inline uint32_t random(T1 s1, T2 s2, T3 s3) {
+	uint8_t x[sizeof(T1)+sizeof(T2)+sizeof(T3)];
+	uint32_t s = 0;
+	*(T1*)(x+s) = s1;
+	s += sizeof(T1);
+	*(T2*)(x+s) = s2;
+	s += sizeof(T2);
+	*(T3*)(x+s) = s3;
+	s += sizeof(T3);
+	return rhash(x, s);
 }
 inline bool file_exists(string filename) {
 	ifstream file(filename, ios_base::binary);
