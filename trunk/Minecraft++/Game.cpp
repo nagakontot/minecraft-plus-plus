@@ -20,7 +20,15 @@ bool Game::Loop() {
 	}
 	//Clear the screen
 	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_DEPTH_BUFFER_BIT);
 	//Draw everything
+	glColor4f(0,1,0,1);
+	glBegin(GL_QUADS);
+	glVertex3f(0,0,0);
+	glVertex3f(100,0,0);
+	glVertex3f(100,100,0);
+	glVertex3f(0,100,0);
+	glEnd();
 	//Display the screen
 	Window.Display();
 	return Window.IsOpened();
