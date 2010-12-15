@@ -1,7 +1,7 @@
 #pragma once
 
 //SFML
-#include <SFML/OpenGL.hpp>
+#include <GL/glew.h>
 #include <SFML/Graphics.hpp>
 #include <SFML/Network.hpp>
 #include <SFML/Audio.hpp>

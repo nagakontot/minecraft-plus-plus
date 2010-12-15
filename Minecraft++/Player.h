@@ -1,4 +1,7 @@
 class Player {
-	Position Position;
-	Rotation Rotation;
-};
+public:
+	Position pos;
+	Rotation rot;
+	Player();
+	void Step();
+} extern player;

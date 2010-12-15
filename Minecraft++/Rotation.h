@@ -1,3 +1,3 @@
 struct Rotation {
-	double x, y, z;
+	double d, p;//Direction and pitch
 };
