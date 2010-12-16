@@ -41,4 +41,5 @@ void Player::Step() {
 	if(input.IsKeyDown(sf::Key::LShift)){
 		pos.z += 0.2;
 	}
+	pos.Update();
 }

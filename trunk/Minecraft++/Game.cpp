@@ -4,7 +4,7 @@
 
 bool Game::Init() {
 	InitBlocks();
-	Window.Create(sf::VideoMode(800,600,32),"Minecraft++",sf::Style::Close|sf::Style::Titlebar,sf::ContextSettings(24,0,0));
+	Window.Create(sf::VideoMode(800,600,32),"Minecraft++",sf::Style::Close|sf::Style::Titlebar);
 	Window.ShowMouseCursor(false);
 	Window.SetFramerateLimit(30);
 	InitGraphics();
@@ -38,19 +38,14 @@ bool Game::Loop() {
 	glClear(GL_COLOR_BUFFER_BIT);
 	glClear(GL_DEPTH_BUFFER_BIT);
 	//Draw everything
-	GetChunk(0,0,0)->Draw();
-	/*glColor4f(1,1,1,1);
-	glBindTexture("textures/dirt.png");
-	glBegin(GL_QUADS);
-	glTexCoord2f(0,0);
-	glVertex3f(0,0,16);
-	glTexCoord2f(16,0);
-	glVertex3f(16,0,16);
-	glTexCoord2f(16,16);
-	glVertex3f(16,16,16);
-	glTexCoord2f(0,16);
-	glVertex3f(0,16,16);
-	glEnd();*/
+	int range = 1;
+	for(int64_t a=player.pos.cx-range;a<=player.pos.cx+range;a++){
+		for(int64_t b=player.pos.cy-range;b<=player.pos.cy+range;b++){
+			for(int64_t c=player.pos.cz-range;c<=player.pos.cz+range;c++){
+				GetChunk(a,b,c)->Draw();
+			}
+		}
+	}
 	//Display the screen
 	Window.Display();
 	return Window.IsOpened();

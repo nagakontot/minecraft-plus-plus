@@ -9,13 +9,14 @@ struct Block{
 
 struct BlockType{
 	BlockType();
-	BlockType(bool solid, uint8_t porosity, bool mineable, uint8_t opacity);
+	BlockType(bool solid, uint8_t porosity, bool mineable, uint8_t opacity, GLuint* texture);
 	bool solid;
 	uint8_t porosity;
 	bool mineable;
 	uint8_t opacity;
+	GLuint* texture;
 };
 
-extern map<uint16_t,BlockType> BlockTypes;
+extern vector<BlockType> BlockTypes;
 
 void InitBlocks();
