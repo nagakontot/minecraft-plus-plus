@@ -49,7 +49,7 @@
 		glVertex3i(x,y+1,z+1);
 #define BLOCK_GENERIC BLOCK_TOP BLOCK_SIDE1 BLOCK_SIDE2 BLOCK_SIDE3 BLOCK_SIDE4 BLOCK_BOTTOM
 
-void Block::Draw(int x, int y, int z) {
+void Block::Draw(int x, int y, int z, Chunk* chunk) {
 	BlockType t = BlockTypes[type];
 	switch(type){
 	case 0:
@@ -76,7 +76,7 @@ BlockType::BlockType() {
 	porosity = 0;
 }
 
-BlockType::BlockType(bool _solid, uint8_t _porosity, bool _mineable, uint8_t _opacity, GLuint* _texture) {
+BlockType::BlockType(bool _solid, uint8_t _porosity, bool _mineable, double _opacity, GLuint* _texture) {
 	solid = _solid;
 	porosity = _porosity;
 	mineable = _mineable;
@@ -91,9 +91,9 @@ void InitBlocks() {
 	//Dirt
 	tex = new GLuint;
 	*tex = GetTexture("textures/dirt.png");
-	BlockTypes.push_back(BlockType(true, 100, true, 255, tex));
+	BlockTypes.push_back(BlockType(true, 100, true, 1, tex));
 	//Stone
 	tex = new GLuint;
 	*tex = GetTexture("textures/stone.png");
-	BlockTypes.push_back(BlockType(true, 20, true, 255, tex));
+	BlockTypes.push_back(BlockType(true, 20, true, 1, tex));
 }
