@@ -6,11 +6,14 @@ Chunk::Chunk(int64_t _x, int64_t _y, int64_t _z) {
 	z = _z;
 	//Map generation goes here =D
 	for(int i = 0; i < 4096; i++){
-		if(rand()%4==0) {
-			Blocks[i].type = 1;
-		} else {
-			Blocks[i].type = 0;
-		}
+		Blocks[i].type = rand()%3;
+	}
+	Chunks.push_back(this);
+}
+
+void Chunk::Draw() {
+	for(int i = 0; i < 4096; i++){
+		Blocks[i].Draw(int(double(i)/256),int(double(i)/16)%16,i%16);
 	}
 }
 

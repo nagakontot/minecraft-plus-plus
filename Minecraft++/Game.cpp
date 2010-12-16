@@ -30,7 +30,7 @@ bool Game::Loop() {
 	player.Step();
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(60,(double)Window.GetWidth()/Window.GetHeight(),0,1000);
+	gluPerspective(60,(double)Window.GetWidth()/Window.GetHeight(),0.1,1000);
 	gluLookAt(0,0,0,ldx(1,player.rot.d)*ldx(1,player.rot.p),ldy(1,player.rot.d)*ldx(1,player.rot.p),ldy(1,player.rot.p),0,0,-1);
 	glTranslated(-player.pos.x,-player.pos.y,-player.pos.z);
 	glMatrixMode(GL_MODELVIEW);
@@ -38,7 +38,8 @@ bool Game::Loop() {
 	glClear(GL_COLOR_BUFFER_BIT);
 	glClear(GL_DEPTH_BUFFER_BIT);
 	//Draw everything
-	glColor4f(1,1,1,1);
+	GetChunk(0,0,0)->Draw();
+	/*glColor4f(1,1,1,1);
 	glBindTexture("textures/dirt.png");
 	glBegin(GL_QUADS);
 	glTexCoord2f(0,0);
@@ -49,7 +50,7 @@ bool Game::Loop() {
 	glVertex3f(16,16,16);
 	glTexCoord2f(0,16);
 	glVertex3f(0,16,16);
-	glEnd();
+	glEnd();*/
 	//Display the screen
 	Window.Display();
 	return Window.IsOpened();
