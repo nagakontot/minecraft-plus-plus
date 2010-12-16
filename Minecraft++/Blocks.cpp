@@ -50,17 +50,18 @@
 #define BLOCK_GENERIC BLOCK_TOP BLOCK_SIDE1 BLOCK_SIDE2 BLOCK_SIDE3 BLOCK_SIDE4 BLOCK_BOTTOM
 
 void Block::Draw(int x, int y, int z) {
+	BlockType t = BlockTypes[type];
 	switch(type){
 	case 0:
 		break;
 	case 1:
-		glBindTexture("textures/dirt.png");
+		glBindTexture(GL_TEXTURE_2D,t.texture[0]);
 		glBegin(GL_QUADS);
 		BLOCK_GENERIC
 		glEnd();
 		break;
 	case 2:
-		glBindTexture("textures/stone.png");
+		glBindTexture(GL_TEXTURE_2D,t.texture[0]);
 		glBegin(GL_QUADS);
 		BLOCK_GENERIC
 		glEnd();
@@ -68,25 +69,31 @@ void Block::Draw(int x, int y, int z) {
 	}
 }
 
-map<uint16_t,BlockType> BlockTypes;
+vector<BlockType> BlockTypes;
 
 BlockType::BlockType() {
 	solid = false;
 	porosity = 0;
 }
 
-BlockType::BlockType(bool _solid, uint8_t _porosity, bool _mineable, uint8_t _opacity) {
+BlockType::BlockType(bool _solid, uint8_t _porosity, bool _mineable, uint8_t _opacity, GLuint* _texture) {
 	solid = _solid;
 	porosity = _porosity;
 	mineable = _mineable;
 	opacity = _opacity;
+	texture = _texture;
 }
 
 void InitBlocks() {
+	GLuint* tex;
 	//Air
-	BlockTypes[0] = BlockType(true, 255, false, 0);
+	BlockTypes.push_back(BlockType(true, 255, false, 0, 0));
 	//Dirt
-	BlockTypes[0] = BlockType(true, 100, true, 255);
+	tex = new GLuint;
+	*tex = GetTexture("textures/dirt.png");
+	BlockTypes.push_back(BlockType(true, 100, true, 255, tex));
 	//Stone
-	BlockTypes[0] = BlockType(true, 20, true, 255);
+	tex = new GLuint;
+	*tex = GetTexture("textures/stone.png");
+	BlockTypes.push_back(BlockType(true, 20, true, 255, tex));
 }

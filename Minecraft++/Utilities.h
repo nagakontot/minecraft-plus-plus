@@ -44,11 +44,9 @@ inline double pdir (double x1, double y1, double x2, double y2) {
 inline double angdif (double angle1, double angle2) {
 	return fmod(fmod(angle1-angle2,360)+540,360)-180;
 }
-inline double sign (double x) {
-	if(x==0) {
-		return 0;
-	}
-	return x/abs(x);
+template <class T>
+inline int8_t sign(T x) {
+	return (x>0)-(x<0);
 }
 inline double psqdis (double x1, double y1, double x2, double y2) {
 	return sqr(x1-x2)+sqr(y1-y2);
@@ -96,6 +94,54 @@ inline uint32_t random(T1 s1, T2 s2, T3 s3) {
 	s += sizeof(T2);
 	*(T3*)(x+s) = s3;
 	s += sizeof(T3);
+	return rhash(x, s);
+}
+template <class T1, class T2, class T3, class T4>
+inline uint32_t random(T1 s1, T2 s2, T3 s3, T4 s4) {
+	uint8_t x[sizeof(T1)+sizeof(T2)+sizeof(T3)+sizeof(T4)];
+	uint32_t s = 0;
+	*(T1*)(x+s) = s1;
+	s += sizeof(T1);
+	*(T2*)(x+s) = s2;
+	s += sizeof(T2);
+	*(T3*)(x+s) = s3;
+	s += sizeof(T3);
+	*(T4*)(x+s) = s4;
+	s += sizeof(T4);
+	return rhash(x, s);
+}
+template <class T1, class T2, class T3, class T4, class T5>
+inline uint32_t random(T1 s1, T2 s2, T3 s3, T4 s4, T5 s5) {
+	uint8_t x[sizeof(T1)+sizeof(T2)+sizeof(T3)+sizeof(T4)+sizeof(T5)];
+	uint32_t s = 0;
+	*(T1*)(x+s) = s1;
+	s += sizeof(T1);
+	*(T2*)(x+s) = s2;
+	s += sizeof(T2);
+	*(T3*)(x+s) = s3;
+	s += sizeof(T3);
+	*(T4*)(x+s) = s4;
+	s += sizeof(T4);
+	*(T5*)(x+s) = s5;
+	s += sizeof(T5);
+	return rhash(x, s);
+}
+template <class T1, class T2, class T3, class T4, class T5, class T6>
+inline uint32_t random(T1 s1, T2 s2, T3 s3, T4 s4, T5 s5, T6 s6) {
+	uint8_t x[sizeof(T1)+sizeof(T2)+sizeof(T3)+sizeof(T4)+sizeof(T5)+sizeof(T6)];
+	uint32_t s = 0;
+	*(T1*)(x+s) = s1;
+	s += sizeof(T1);
+	*(T2*)(x+s) = s2;
+	s += sizeof(T2);
+	*(T3*)(x+s) = s3;
+	s += sizeof(T3);
+	*(T4*)(x+s) = s4;
+	s += sizeof(T4);
+	*(T5*)(x+s) = s5;
+	s += sizeof(T5);
+	*(T6*)(x+s) = s6;
+	s += sizeof(T6);
 	return rhash(x, s);
 }
 inline bool file_exists(string filename) {

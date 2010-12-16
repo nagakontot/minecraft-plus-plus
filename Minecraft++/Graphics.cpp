@@ -11,10 +11,11 @@ void InitGraphics() {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
-void glBindTexture(string name) {
+GLuint GetTexture(string name) {
 	if(textures.find(name)==textures.end()){
 		if(!textures[name].LoadFromFile(name)){
-			return;
+			cout << "Failed to load texture " << name << endl;
+			return 0;
 		}
 		textures[name].Bind();
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -26,6 +27,9 @@ void glBindTexture(string name) {
 	} else {
 		textures[name].Bind();
 	}
+	GLint t[1];
+	glGetIntegerv(GL_TEXTURE_BINDING_2D,t);
+	return *t;
 }
 
 map<string, sf::Image> textures;
