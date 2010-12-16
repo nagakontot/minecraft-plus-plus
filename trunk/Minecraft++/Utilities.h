@@ -10,12 +10,12 @@ inline std::string tostring (const T& t) {
 }
 inline std::string tostring(const int& t) {
 	char buffer[15];
-	sprintf_s(buffer,"%i",t);
+	sprintf(buffer,"%i",t);
 	return (string)buffer;
 }
 inline std::string tostring(const double& t) {
 	char buffer[15];
-	sprintf_s(buffer,"%f",t);
+	sprintf(buffer,"%f",t);
 	return (string)buffer;
 }
 template <class T>

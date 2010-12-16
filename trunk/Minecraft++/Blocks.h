@@ -4,16 +4,16 @@ struct Block{
 	uint8_t temperature;
 	uint8_t saturation;
 	uint16_t light;
-	void Draw(int x, int y, int z);
+	void Draw(int x, int y, int z, struct Chunk* chunk);
 };
 
 struct BlockType{
 	BlockType();
-	BlockType(bool solid, uint8_t porosity, bool mineable, uint8_t opacity, GLuint* texture);
+	BlockType(bool solid, uint8_t porosity, bool mineable, double opacity, GLuint* texture);
 	bool solid;
 	uint8_t porosity;
 	bool mineable;
-	uint8_t opacity;
+	double opacity;
 	GLuint* texture;
 };
 
