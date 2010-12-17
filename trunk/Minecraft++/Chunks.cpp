@@ -31,6 +31,15 @@ Chunk::Chunk(int64_t _x, int64_t _y, int64_t _z) {
 	if(c!=0){c->zp = this; zn = c;}
 	c = GetChunk(x,y,z+1,false);
 	if(c!=0){c->zn = this; zp = c;}
+	for(int a=-1;a<=16;a++){
+		for(int b=-1;b<=16;b++){
+			for(int c=-1;c<=16;c++){
+				Chunk* cl = this;
+				Block* bl = GetBlock(a,b,c,cl);
+				if(bl!=0){bl->Update(a,b,c,cl);}
+			}
+		}
+	}
 	Chunks.push_back(this);
 }
 
@@ -38,7 +47,7 @@ void Chunk::Draw() {
 	glLoadIdentity();
 	glTranslated(-16*(player.pos.cx-x), -16*(player.pos.cy-y), -16*(player.pos.cz-z));
 	for(int i = 0; i < 4096; i++){
-		Blocks[i].Draw(int(double(i)/256), int(double(i)/16)%16, i%16, this);
+		Blocks[i].Draw(i/256, (i/16)%16, i%16, this);
 	}
 }
 
