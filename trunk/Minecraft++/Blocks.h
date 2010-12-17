@@ -5,6 +5,7 @@ struct Block{
 	uint8_t saturation;
 	uint8_t light;
 	uint8_t extra;
+	Block();
 	void Draw(int x, int y, int z, struct Chunk* chunk);
 	void Update(int x, int y, int z, struct Chunk* chunk);
 };

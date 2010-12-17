@@ -1,5 +1,14 @@
 #include "Global.h"
 
+Block::Block() {
+	type = 0;
+	info = 0;
+	temperature = 0;
+	saturation = 0;
+	light = 0;
+	extra = 0;
+}
+
 Block* GetBlock(int x, int y, int z, Chunk*& chunk) {
 	if(x<0){
 		chunk = chunk->xn;
@@ -34,82 +43,48 @@ Block* GetBlock(int x, int y, int z, Chunk*& chunk) {
 	return &(chunk->Blocks[x*256+y*16+z]);
 }
 
-#define BLOCK_ZN glTexCoord2i(0,0);\
-		glVertex3i(x,y,z);\
-		glTexCoord2i(1,0);\
-		glVertex3i(x+1,y,z);\
-		glTexCoord2i(1,1);\
-		glVertex3i(x+1,y+1,z);\
-		glTexCoord2i(0,1);\
-		glVertex3i(x,y+1,z);
-#define BLOCK_XN glTexCoord2i(0,0);\
-		glVertex3i(x,y,z);\
-		glTexCoord2i(1,0);\
-		glVertex3i(x,y+1,z);\
-		glTexCoord2i(1,1);\
-		glVertex3i(x,y+1,z+1);\
-		glTexCoord2i(0,1);\
-		glVertex3i(x,y,z+1);
-#define BLOCK_YP glTexCoord2i(0,0);\
-		glVertex3i(x,y+1,z);\
-		glTexCoord2i(1,0);\
-		glVertex3i(x+1,y+1,z);\
-		glTexCoord2i(1,1);\
-		glVertex3i(x+1,y+1,z+1);\
-		glTexCoord2i(0,1);\
-		glVertex3i(x,y+1,z+1);
-#define BLOCK_XP glTexCoord2i(0,0);\
-		glVertex3i(x+1,y+1,z);\
-		glTexCoord2i(1,0);\
-		glVertex3i(x+1,y,z);\
-		glTexCoord2i(1,1);\
-		glVertex3i(x+1,y,z+1);\
-		glTexCoord2i(0,1);\
-		glVertex3i(x+1,y+1,z+1);
-#define BLOCK_YN glTexCoord2i(0,0);\
-		glVertex3i(x+1,y,z);\
-		glTexCoord2i(1,0);\
-		glVertex3i(x,y,z);\
-		glTexCoord2i(1,1);\
-		glVertex3i(x,y,z+1);\
-		glTexCoord2i(0,1);\
-		glVertex3i(x+1,y,z+1);
-#define BLOCK_ZP glTexCoord2i(0,0);\
-		glVertex3i(x,y,z+1);\
-		glTexCoord2i(1,0);\
-		glVertex3i(x+1,y,z+1);\
-		glTexCoord2i(1,1);\
-		glVertex3i(x+1,y+1,z+1);\
-		glTexCoord2i(0,1);\
-		glVertex3i(x,y+1,z+1);
-
-#define BLOCK_GENERIC	if(extra&1){BLOCK_XP}\
-						if(extra&2){BLOCK_XN}\
-						if(extra&4){BLOCK_YP}\
-						if(extra&8){BLOCK_YN}\
-						if(extra&16){BLOCK_ZP}\
-						if(extra&32){BLOCK_ZN}
+#define BLOCK_GENERIC	if(extra&1){glVertexPointer(3,GL_SHORT,0,M_XP);glDrawArrays(GL_QUADS,0,4);}\
+						if(extra&2){glVertexPointer(3,GL_SHORT,0,M_XN);glDrawArrays(GL_QUADS,0,4);}\
+						if(extra&4){glVertexPointer(3,GL_SHORT,0,M_YP);glDrawArrays(GL_QUADS,0,4);}\
+						if(extra&8){glVertexPointer(3,GL_SHORT,0,M_YN);glDrawArrays(GL_QUADS,0,4);}\
+						if(extra&16){glVertexPointer(3,GL_SHORT,0,M_ZP);glDrawArrays(GL_QUADS,0,4);}\
+						if(extra&32){glVertexPointer(3,GL_SHORT,0,M_ZN);glDrawArrays(GL_QUADS,0,4);}
 
 void Block::Draw(int x, int y, int z, Chunk* chunk) {
-	BlockType t = BlockTypes[type];
+	if(!(extra<<2>>2)){
+		return;
+	}
+	const BlockType& t = BlockTypes[type];
+	glPushMatrix();
+	glTranslated(x,y,z);
 	switch(type){
 	case 0:
 		break;
 	case 1:
-		if(!(extra<<2>>2)){break;}
 		BindTexture(t.texture[0]);
-		glBegin(GL_QUADS);
+		glTexCoordPointer(2,GL_SHORT,0,T_QUAD);
 		BLOCK_GENERIC;
-		glEnd();
 		break;
 	case 2:
-		if(!(extra<<2>>2)){break;}
 		BindTexture(t.texture[0]);
-		glBegin(GL_QUADS);
+		glTexCoordPointer(2,GL_SHORT,0,T_QUAD);
 		BLOCK_GENERIC;
-		glEnd();
+		break;
+	case 3:
+		glTexCoordPointer(2,GL_SHORT,0,T_QUAD);
+		if(extra&32){
+			BindTexture(t.texture[0]);
+			glVertexPointer(3,GL_SHORT,0,M_ZN);glDrawArrays(GL_QUADS,0,4);
+		}
+		BindTexture(t.texture[1]);
+		if(extra&1){glVertexPointer(3,GL_SHORT,0,M_XP);glDrawArrays(GL_QUADS,0,4);}
+		if(extra&2){glVertexPointer(3,GL_SHORT,0,M_XN);glDrawArrays(GL_QUADS,0,4);}
+		if(extra&4){glVertexPointer(3,GL_SHORT,0,M_YP);glDrawArrays(GL_QUADS,0,4);}
+		if(extra&8){glVertexPointer(3,GL_SHORT,0,M_YN);glDrawArrays(GL_QUADS,0,4);}
+		if(extra&16){glVertexPointer(3,GL_SHORT,0,M_ZP);glDrawArrays(GL_QUADS,0,4);}
 		break;
 	}
+	glPopMatrix();
 }
 
 bool BlockVisible(int x, int y, int z, Chunk* chunk) {
@@ -155,4 +130,9 @@ void InitBlocks() {
 	tex = new GLuint;
 	*tex = GetTexture("textures/stone.png");
 	BlockTypes[2] = BlockType(true, 20, true, 1, tex);
+	//Grass
+	tex = new GLuint[2];
+	tex[0] = GetTexture("textures/grass.png");
+	tex[1] = GetTexture("textures/grass side.png");
+	BlockTypes[3] = BlockType(true, 100, true, 1, tex);
 }

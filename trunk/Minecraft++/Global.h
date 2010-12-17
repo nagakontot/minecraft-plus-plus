@@ -22,6 +22,7 @@ using namespace std;
 #include "Position.h"
 #include "Rotation.h"
 #include "Graphics.h"
+#include "Models.h"
 #include "Blocks.h"
 #include "Chunks.h"
 #include "Player.h"
