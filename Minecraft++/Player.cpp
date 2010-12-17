@@ -3,9 +3,9 @@
 Player player;
 
 Player::Player() {
-	pos.x = 0;
-	pos.y = 0;
-	pos.z = 14.5;
+	pos.x = 8;
+	pos.y = 8;
+	pos.z = 8;
 	pos.cx = 0;
 	pos.cy = 0;
 	pos.cz = -1;
