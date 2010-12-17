@@ -17,6 +17,6 @@ struct BlockType{
 	GLuint* texture;
 };
 
-extern vector<BlockType> BlockTypes;
+extern BlockType BlockTypes[100];
 
 void InitBlocks();
