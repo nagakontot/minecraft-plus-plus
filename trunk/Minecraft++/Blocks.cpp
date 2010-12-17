@@ -1,7 +1,7 @@
 #include "Global.h"
 
 
-uint16_t NeighborType(int x, int y, int z, Chunk* chunk) {
+inline uint16_t NeighborType(int x, int y, int z, Chunk* chunk) {
 	if(x<0){
 		chunk = chunk->xn;
 		x += 16;
@@ -31,7 +31,7 @@ uint16_t NeighborType(int x, int y, int z, Chunk* chunk) {
 	}
 	return chunk->Blocks[x*256+y*16+z].type;
 }
-double NeighborOpacity(int x, int y, int z, Chunk* chunk) {
+inline double NeighborOpacity(int x, int y, int z, Chunk* chunk) {
 	return BlockTypes[NeighborType(x, y, z, chunk)].opacity;
 }
 
@@ -83,29 +83,44 @@ double NeighborOpacity(int x, int y, int z, Chunk* chunk) {
 		glVertex3i(x+1,y+1,z+1);\
 		glTexCoord2i(0,1);\
 		glVertex3i(x,y+1,z+1);
-#define VISIBLE(x,y,z,c) if(NeighborOpacity(x,y,z,chunk)<1){c}
-#define BLOCK_GENERIC	VISIBLE(x,y,z-1,BLOCK_TOP)\
-						VISIBLE(x-1,y,z,BLOCK_SIDE1)\
-						VISIBLE(x,y+1,z,BLOCK_SIDE2)\
-						VISIBLE(x+1,y,z,BLOCK_SIDE3)\
-						VISIBLE(x,y-1,z,BLOCK_SIDE4)\
-						VISIBLE(x,y,z+1,BLOCK_BOTTOM)
-
+#define VISIBLE(x,y,z)	NeighborOpacity(x,y,z,chunk)<1
+#define BLOCK_GENERIC	if(zn){BLOCK_TOP}\
+						if(xn){BLOCK_SIDE1}\
+						if(yp){BLOCK_SIDE2}\
+						if(xp){BLOCK_SIDE3}\
+						if(yn){BLOCK_SIDE4}\
+						if(zp){BLOCK_BOTTOM}
+#define CHECK_VISIBLE	xp = VISIBLE(x+1,y,z);\
+						xn = VISIBLE(x-1,y,z);\
+						yp = VISIBLE(x,y+1,z);\
+						yn = VISIBLE(x,y-1,z);\
+						zp = VISIBLE(x,y,z+1);\
+						zn = VISIBLE(x,y,z-1);
 void Block::Draw(int x, int y, int z, Chunk* chunk) {
 	BlockType t = BlockTypes[type];
+	bool xp;
+	bool xn;
+	bool yp;
+	bool yn;
+	bool zp;
+	bool zn;
 	switch(type){
 	case 0:
 		break;
 	case 1:
+		CHECK_VISIBLE;
+		if(!xp && !xn && !yp && !yn && !zp && !zn){break;}
 		BindTexture(t.texture[0]);
 		glBegin(GL_QUADS);
-		BLOCK_GENERIC
+		BLOCK_GENERIC;
 		glEnd();
 		break;
 	case 2:
+		CHECK_VISIBLE;
+		if(!xp && !xn && !yp && !yn && !zp && !zn){break;}
 		BindTexture(t.texture[0]);
 		glBegin(GL_QUADS);
-		BLOCK_GENERIC
+		BLOCK_GENERIC;
 		glEnd();
 		break;
 	}
