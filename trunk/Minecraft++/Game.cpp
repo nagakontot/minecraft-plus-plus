@@ -39,10 +39,17 @@ bool Game::Loop() {
 	glClear(GL_DEPTH_BUFFER_BIT);
 	//Draw everything
 	int range = 1;
-	for(int64_t a=player.pos.cx-range;a<=player.pos.cx+range;a++){
-		for(int64_t b=player.pos.cy-range;b<=player.pos.cy+range;b++){
-			for(int64_t c=player.pos.cz-range;c<=player.pos.cz+range;c++){
-				GetChunk(a,b,c)->Draw();
+	for(int64_t a=0;a<=range;a++){
+		for(int64_t b=0;b<=range;b++){
+			for(int64_t c=0;c<=range;c++){
+				GetChunk(player.pos.cx+a,player.pos.cy+b,player.pos.cz+c)->Draw();
+				if(a!=0){GetChunk(player.pos.cx-a,player.pos.cy+b,player.pos.cz+c)->Draw();}
+				if(b!=0){GetChunk(player.pos.cx+a,player.pos.cy-b,player.pos.cz+c)->Draw();}
+				if(c!=0){GetChunk(player.pos.cx+a,player.pos.cy+b,player.pos.cz-c)->Draw();}
+				if(a!=0 && b!=0){GetChunk(player.pos.cx-a,player.pos.cy-b,player.pos.cz+c)->Draw();}
+				if(b!=0 && c!=0){GetChunk(player.pos.cx+a,player.pos.cy-b,player.pos.cz-c)->Draw();}
+				if(c!=0 && a!=0){GetChunk(player.pos.cx-a,player.pos.cy+b,player.pos.cz-c)->Draw();}
+				if(a!=0 && b!=0 && c!=0){GetChunk(player.pos.cx-a,player.pos.cy-b,player.pos.cz-c)->Draw();}
 			}
 		}
 	}

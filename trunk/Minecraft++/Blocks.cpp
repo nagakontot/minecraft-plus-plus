@@ -97,13 +97,13 @@ void Block::Draw(int x, int y, int z, Chunk* chunk) {
 	case 0:
 		break;
 	case 1:
-		glBindTexture(GL_TEXTURE_2D,t.texture[0]);
+		BindTexture(t.texture[0]);
 		glBegin(GL_QUADS);
 		BLOCK_GENERIC
 		glEnd();
 		break;
 	case 2:
-		glBindTexture(GL_TEXTURE_2D,t.texture[0]);
+		BindTexture(t.texture[0]);
 		glBegin(GL_QUADS);
 		BLOCK_GENERIC
 		glEnd();

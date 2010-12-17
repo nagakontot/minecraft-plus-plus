@@ -33,5 +33,11 @@ GLuint GetTexture(string name) {
 	glGetIntegerv(GL_TEXTURE_BINDING_2D,t);
 	return *t;
 }
+void BindTexture(GLuint tex) {
+	if(tex!=bound){
+		glBindTexture(GL_TEXTURE_2D,tex);
+	}
+}
 
 map<string, sf::Image> textures;
+GLuint bound = 0;
