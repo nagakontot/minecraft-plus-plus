@@ -6,7 +6,7 @@ bool Game::Init() {
 	InitBlocks();
 	Window.Create(sf::VideoMode(800,600,32),"Minecraft++",sf::Style::Close|sf::Style::Titlebar);
 	Window.ShowMouseCursor(false);
-	Window.SetFramerateLimit(30);
+	//Window.SetFramerateLimit(30);
 	InitGraphics();
 	srand(clock());
 	return true;
@@ -48,6 +48,7 @@ bool Game::Loop() {
 	}
 	//Display the screen
 	Window.Display();
+	cout << 1/Window.GetFrameTime() << endl;
 	return Window.IsOpened();
 }
 void Game::Unload() {
