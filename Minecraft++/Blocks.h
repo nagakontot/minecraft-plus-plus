@@ -3,8 +3,10 @@ struct Block{
 	uint16_t info;
 	uint8_t temperature;
 	uint8_t saturation;
-	uint16_t light;
+	uint8_t light;
+	uint8_t extra;
 	void Draw(int x, int y, int z, struct Chunk* chunk);
+	void Update(int x, int y, int z, struct Chunk* chunk);
 };
 
 struct BlockType{
@@ -20,3 +22,7 @@ struct BlockType{
 extern BlockType BlockTypes[100];
 
 void InitBlocks();
+
+Block* GetBlock(int x, int y, int z, Chunk*& chunk);
+
+bool BlockVisible(int x, int y, int z, Chunk* chunk);
