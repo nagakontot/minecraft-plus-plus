@@ -38,7 +38,7 @@ bool Game::Loop() {
 	glClear(GL_COLOR_BUFFER_BIT);
 	glClear(GL_DEPTH_BUFFER_BIT);
 	//Draw everything
-	int range = 1;
+	int range = 2;
 	for(int64_t a=0;a<=range;a++){
 		for(int64_t b=0;b<=range;b++){
 			for(int64_t c=0;c<=range;c++){
