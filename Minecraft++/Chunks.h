@@ -12,3 +12,4 @@ struct Chunk {
 Chunk* GetChunk(int64_t x, int64_t y, int64_t z, bool generate = true);
 
 extern vector<Chunk*> Chunks;
+extern map<int64_t,map<int64_t,map<int64_t,Chunk*>>> ChunkPos;
