@@ -3,7 +3,7 @@ struct Chunk {
 	Chunk *xp, *xn, *yp, *yn, *zp, *zn;
 	Block Blocks[4096];
 	Chunk(int64_t x, int64_t y, int64_t z);
-	void Draw();
+	const void Draw();
 	void Update();
 };
 

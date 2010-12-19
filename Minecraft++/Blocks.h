@@ -6,18 +6,20 @@ struct Block{
 	uint8_t light;
 	uint8_t extra;
 	Block();
-	void Draw(int x, int y, int z, struct Chunk* chunk);
+	const void Draw(int x, int y, int z);
 	void Update(int x, int y, int z, struct Chunk* chunk);
 };
 
 struct BlockType{
 	BlockType();
-	BlockType(bool solid, uint8_t porosity, bool mineable, double opacity, GLuint* texture);
+	BlockType(bool solid, uint8_t porosity, bool mineable, double opacity, const GLfloat* model, const GLfloat* tex, uint16_t verts);
 	bool solid;
 	uint8_t porosity;
 	bool mineable;
 	double opacity;
-	GLuint* texture;
+	const GLfloat* model;
+	const GLfloat* tex;
+	uint16_t verts;
 };
 
 extern BlockType BlockTypes[100];
