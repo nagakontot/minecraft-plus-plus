@@ -84,14 +84,12 @@ void Chunk::Update() {
 	}
 }
 
-void Chunk::Draw() {
+const void Chunk::Draw() {
 	glLoadIdentity();
 	glTranslated(-16*(player.pos.cx-x), -16*(player.pos.cy-y), -16*(player.pos.cz-z));
-	//glPushMatrix();
 	for(short i = 0; i < 4096; i++){
-		Blocks[i].Draw(i/256, (i/16)%16, i%16, this);
+		Blocks[i].Draw(i/256, (i/16)%16, i%16);
 	}
-	//glPopMatrix();
 }
 
 Chunk* GetChunk(int64_t x, int64_t y, int64_t z, bool generate) {

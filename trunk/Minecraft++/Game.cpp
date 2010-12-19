@@ -4,7 +4,7 @@
 
 bool Game::Init() {
 	InitBlocks();
-	Window.Create(sf::VideoMode(800,600,32),"Minecraft++",sf::Style::Close|sf::Style::Titlebar);
+	Window.Create(sf::VideoMode(800,600,32),"Minecraft++",sf::Style::Close|sf::Style::Titlebar,sf::ContextSettings(24,0,0,3,3));
 	Window.ShowMouseCursor(false);
 	//Window.SetFramerateLimit(30);
 	InitGraphics();
@@ -39,6 +39,7 @@ bool Game::Loop() {
 	glClear(GL_DEPTH_BUFFER_BIT);
 	//Draw everything
 	int range = 1;
+	glBindTexture(GL_TEXTURE_3D,TEX);
 	for(int64_t a=0;a<=range;a++){
 		for(int64_t b=0;b<=range;b++){
 			for(int64_t c=0;c<=range;c++){
