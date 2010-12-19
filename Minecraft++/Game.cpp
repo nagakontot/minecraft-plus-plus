@@ -1,6 +1,6 @@
 #include "Global.h"
 
-
+bool Game::Active;
 
 bool Game::Init() {
 	InitBlocks();
@@ -8,6 +8,7 @@ bool Game::Init() {
 	Window.ShowMouseCursor(false);
 	//Window.SetFramerateLimit(30);
 	InitGraphics();
+	Active = true;
 	srand(clock());
 	return true;
 }
@@ -25,6 +26,12 @@ bool Game::Loop() {
 				Window.Close();
 				break;
 			}
+		case sf::Event::GainedFocus:
+			Active = true;
+			break;
+		case sf::Event::LostFocus:
+			Active = false;
+			break;
 		}
 	}
 	player.Step();
@@ -38,7 +45,7 @@ bool Game::Loop() {
 	glClear(GL_COLOR_BUFFER_BIT);
 	glClear(GL_DEPTH_BUFFER_BIT);
 	//Draw everything
-	int range = 1;
+	int range = 4;
 	glBindTexture(GL_TEXTURE_3D,TEX);
 	for(int64_t a=0;a<=range;a++){
 		for(int64_t b=0;b<=range;b++){

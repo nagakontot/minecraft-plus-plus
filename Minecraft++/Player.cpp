@@ -14,7 +14,7 @@ Player::Player() {
 
 void Player::Step() {
 	const sf::Input& input = Window.GetInput();
-	if(input.IsKeyDown(sf::Key::R)){
+	if(Game::Active){
 		int mx = input.GetMouseX()-Window.GetWidth()/2;
 		int my = input.GetMouseY()-Window.GetHeight()/2;
 		Window.SetCursorPosition(Window.GetWidth()/2,Window.GetHeight()/2);
