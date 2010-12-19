@@ -11,6 +11,9 @@ Chunk::Chunk(int64_t _x, int64_t _y, int64_t _z) {
 	yn = 0;
 	zp = 0;
 	zn = 0;
+	model = 0;
+	tex = 0;
+	verts = 0;
 	//Map generation goes here =D
 	int c1 = random(x,y)%32-16;
 	int c2 = random(x+1,y)%32-16;
@@ -75,10 +78,41 @@ Chunk::Chunk(int64_t _x, int64_t _y, int64_t _z) {
 }
 
 void Chunk::Update() {
+	delete[verts*3] model;
+	delete[verts*3] tex;
+	verts = 0;
 	for(int a=0;a<16;a++){
 		for(int b=0;b<16;b++){
 			for(int c=0;c<16;c++){
-				Blocks[a*256+b*16+c].Update(a,b,c,this);
+				Block* bl = &Blocks[a*256+b*16+c];
+				bl->Update(a,b,c,this);
+				if(bl->extra&1){
+					verts += BlockTypes[bl->type].verts;
+				}
+			}
+		}
+	}
+	model = new GLfloat[verts*3];
+	tex = new GLfloat[verts*3];
+	int i = 0;
+	for(int a=0;a<16;a++){
+		for(int b=0;b<16;b++){
+			for(int c=0;c<16;c++){
+				Block* bl = &Blocks[a*256+b*16+c];
+				BlockType t = BlockTypes[bl->type];
+				if(bl->extra&1){
+					for(int j=0; j<t.verts; j++){
+						int l = 3*i;
+						int r = 3*j;
+						model[l] = t.model[r]+a;
+						tex[l] = t.tex[r];
+						model[l+1] = t.model[r+1]+b;
+						tex[l+1] = t.tex[r+1];
+						model[l+2] = t.model[r+2]+c;
+						tex[l+2] = t.tex[r+2];
+						i++;
+					}
+				}
 			}
 		}
 	}
@@ -87,9 +121,16 @@ void Chunk::Update() {
 const void Chunk::Draw() {
 	glLoadIdentity();
 	glTranslated(-16*(player.pos.cx-x), -16*(player.pos.cy-y), -16*(player.pos.cz-z));
-	for(short i = 0; i < 4096; i++){
-		Blocks[i].Draw(i/256, (i/16)%16, i%16);
-	}
+	glTexCoordPointer(3,GL_FLOAT,0,tex);
+	glVertexPointer(3,GL_FLOAT,0,model);
+	glDrawArrays(GL_QUADS,0,verts);
+	//for(int a=0;a<16;a++){
+	//	for(int b=0;b<16;b++){
+	//		for(int c=0;c<16;c++){
+	//			Blocks[a*256+b*16+c].Draw(a,b,c);
+	//		}
+	//	}
+	//}
 }
 
 Chunk* GetChunk(int64_t x, int64_t y, int64_t z, bool generate) {
