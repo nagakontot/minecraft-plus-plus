@@ -2,6 +2,7 @@
 
 Chunk::Chunk(int64_t _x, int64_t _y, int64_t _z) {
 	Chunks.push_back(this);
+	ChunkPos[_x][_y][_z] = this;
 	x = _x;
 	y = _y;
 	z = _z;
@@ -78,8 +79,8 @@ Chunk::Chunk(int64_t _x, int64_t _y, int64_t _z) {
 }
 
 void Chunk::Update() {
-	delete[verts*3] model;
-	delete[verts*3] tex;
+	delete[] model;
+	delete[] tex;
 	verts = 0;
 	for(int a=0;a<16;a++){
 		for(int b=0;b<16;b++){
@@ -134,18 +135,15 @@ const void Chunk::Draw() {
 }
 
 Chunk* GetChunk(int64_t x, int64_t y, int64_t z, bool generate) {
-	unsigned int s = Chunks.size();
-	for(unsigned int i = 0; i < s; i++){
-		Chunk* c = Chunks[i];
-		if(c->x==x && c->y==y && c->z==z) {
-			return Chunks[i];
-		}
+	Chunk* c = ChunkPos[x][y][z];
+	if(c!=0){
+		return c;
 	}
 	if(generate){
 		return new Chunk(x, y, z);
-	} else {
-		return 0;
 	}
+	return 0;
 }
 
 vector<Chunk*> Chunks;
+map<int64_t,map<int64_t,map<int64_t,Chunk*>>> ChunkPos;
