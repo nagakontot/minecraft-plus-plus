@@ -8,7 +8,9 @@ bool Game::Init() {
 	Window.ShowMouseCursor(false);
 	//Window.SetFramerateLimit(30);
 	InitGraphics();
+	Window.SetActive();
 	Active = true;
+	boost::thread thread(ChunkUpdateThread);
 	srand(clock());
 	return true;
 }

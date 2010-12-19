@@ -6,6 +6,10 @@
 #include <SFML/Network.hpp>
 #include <SFML/Audio.hpp>
 
+//Boost
+#include <boost/filesystem.hpp>
+#include <boost/thread.hpp>
+
 //STL
 #include <iostream>
 #include <fstream>
@@ -15,6 +19,7 @@
 #include <cstdint>
 #include <random>
 #include <functional>
+#include <queue>
 using namespace std;
 
 //Our own headers

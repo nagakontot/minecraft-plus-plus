@@ -1,6 +1,8 @@
 #include "Global.h"
 
 Chunk::Chunk(int64_t _x, int64_t _y, int64_t _z) {
+	generated = false;
+	updated = false;
 	Chunks.push_back(this);
 	ChunkPos[_x][_y][_z] = this;
 	x = _x;
@@ -15,6 +17,11 @@ Chunk::Chunk(int64_t _x, int64_t _y, int64_t _z) {
 	model = 0;
 	tex = 0;
 	verts = 0;
+	AddChunkUpdate(this);
+}
+
+void Chunk::Generate() {
+	lock.lock();
 	//Map generation goes here =D
 	int c1 = random(x,y)%32-16;
 	int c2 = random(x+1,y)%32-16;
@@ -38,47 +45,50 @@ Chunk::Chunk(int64_t _x, int64_t _y, int64_t _z) {
 			}
 		}
 	}
+	//Add updates for all neighboring chunks
 	Chunk* c;
 	c = GetChunk(x-1,y,z,false);
 	if(c!=0){
 		c->xp = this;
 		xn = c;
-		c->Update();
+		AddChunkUpdate(c);
 	}
 	c = GetChunk(x+1,y,z,false);
 	if(c!=0){
 		c->xn = this;
 		xp = c;
-		c->Update();
+		AddChunkUpdate(c);
 	}
 	c = GetChunk(x,y-1,z,false);
 	if(c!=0){
 		c->yp = this;
 		yn = c;
-		c->Update();
+		AddChunkUpdate(c);
 	}
 	c = GetChunk(x,y+1,z,false);
 	if(c!=0){
 		c->yn = this;
 		yp = c;
-		c->Update();
+		AddChunkUpdate(c);
 	}
 	c = GetChunk(x,y,z-1,false);
 	if(c!=0){
 		c->zp = this;
 		zn = c;
-		c->Update();
+		AddChunkUpdate(c);
 	}
 	c = GetChunk(x,y,z+1,false);
 	if(c!=0){
 		c->zn = this;
 		zp = c;
-		c->Update();
+		AddChunkUpdate(c);
 	}
-	Update();
+	generated = true;
+	lock.unlock();
 }
 
 void Chunk::Update() {
+	lock.lock();
 	delete[] model;
 	delete[] tex;
 	verts = 0;
@@ -117,21 +127,22 @@ void Chunk::Update() {
 			}
 		}
 	}
+	updated = true;
+	lock.unlock();
 }
 
 const void Chunk::Draw() {
-	glLoadIdentity();
-	glTranslated(-16*(player.pos.cx-x), -16*(player.pos.cy-y), -16*(player.pos.cz-z));
-	glTexCoordPointer(3,GL_FLOAT,0,tex);
-	glVertexPointer(3,GL_FLOAT,0,model);
-	glDrawArrays(GL_QUADS,0,verts);
-	//for(int a=0;a<16;a++){
-	//	for(int b=0;b<16;b++){
-	//		for(int c=0;c<16;c++){
-	//			Blocks[a*256+b*16+c].Draw(a,b,c);
-	//		}
-	//	}
-	//}
+	if(!lock.try_lock()){
+		return;
+	}
+	if(generated && updated){
+		glLoadIdentity();
+		glTranslated(-16*(player.pos.cx-x), -16*(player.pos.cy-y), -16*(player.pos.cz-z));
+		glTexCoordPointer(3,GL_FLOAT,0,tex);
+		glVertexPointer(3,GL_FLOAT,0,model);
+		glDrawArrays(GL_QUADS,0,verts);
+	}
+	lock.unlock();
 }
 
 Chunk* GetChunk(int64_t x, int64_t y, int64_t z, bool generate) {
@@ -147,3 +158,29 @@ Chunk* GetChunk(int64_t x, int64_t y, int64_t z, bool generate) {
 
 vector<Chunk*> Chunks;
 map<int64_t,map<int64_t,map<int64_t,Chunk*>>> ChunkPos;
+
+void ChunkUpdateThread() {
+	while(true){
+		if(ChunksToUpdate.empty()){
+			sf::Sleep(0.1);
+		} else {
+			ChunkUpdate.lock();
+			Chunk* c = ChunksToUpdate.front();
+			ChunksToUpdate.pop();
+			ChunkUpdate.unlock();
+			if(!c->generated){
+				c->Generate();
+			}
+			c->Update();
+		}
+	}
+}
+
+void AddChunkUpdate(Chunk* c) {
+	ChunkUpdate.lock();
+	ChunksToUpdate.push(c);
+	ChunkUpdate.unlock();
+}
+
+queue<Chunk*> ChunksToUpdate;
+boost::mutex ChunkUpdate;
