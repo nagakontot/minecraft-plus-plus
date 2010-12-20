@@ -88,9 +88,6 @@ void Chunk::Generate() {
 }
 
 void Chunk::Update() {
-	lock.lock();
-	delete[] model;
-	delete[] tex;
 	verts = 0;
 	for(int a=0;a<16;a++){
 		for(int b=0;b<16;b++){
@@ -103,8 +100,8 @@ void Chunk::Update() {
 			}
 		}
 	}
-	model = new GLfloat[verts*3];
-	tex = new GLfloat[verts*3];
+	GLfloat *nmodel = new GLfloat[verts*3];
+	GLfloat *ntex = new GLfloat[verts*3];
 	int i = 0;
 	for(int a=0;a<16;a++){
 		for(int b=0;b<16;b++){
@@ -115,18 +112,23 @@ void Chunk::Update() {
 					for(int j=0; j<t.verts; j++){
 						int l = 3*i;
 						int r = 3*j;
-						model[l] = t.model[r]+a;
-						tex[l] = t.tex[r];
-						model[l+1] = t.model[r+1]+b;
-						tex[l+1] = t.tex[r+1];
-						model[l+2] = t.model[r+2]+c;
-						tex[l+2] = t.tex[r+2];
+						nmodel[l] = t.model[r]+a;
+						ntex[l] = t.tex[r];
+						nmodel[l+1] = t.model[r+1]+b;
+						ntex[l+1] = t.tex[r+1];
+						nmodel[l+2] = t.model[r+2]+c;
+						ntex[l+2] = t.tex[r+2];
 						i++;
 					}
 				}
 			}
 		}
 	}
+	lock.lock();
+	delete[] model;
+	delete[] tex;
+	model = nmodel;
+	tex = ntex;
 	updated = true;
 	lock.unlock();
 }

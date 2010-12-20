@@ -57,7 +57,7 @@ const void Block::Draw(int x, int y, int z) {
 
 bool BlockVisible(int x, int y, int z, Chunk* chunk) {
 	Block* b = GetBlock(x, y, z, chunk);
-	if(b==0){return true;}
+	if(b==0){return false;}
 	return BlockTypes[b->type].opacity<1;
 }
 
