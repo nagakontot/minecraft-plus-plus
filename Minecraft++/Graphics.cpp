@@ -3,6 +3,7 @@
 sf::Window Window;
 GLuint TEX;
 #define AddTex(x, y) glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, x, TEXTURE_SIZE, TEXTURE_SIZE, 1, GL_RGBA, GL_UNSIGNED_BYTE, GetPixels(y));
+
 void InitGraphics() {
 	glewInit();
 	glClearColor(0.3,0.6,1,1);
@@ -23,14 +24,7 @@ void InitGraphics() {
 	glTexParameteri(GL_TEXTURE_3D,GL_TEXTURE_WRAP_S,GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_3D,GL_TEXTURE_WRAP_T,GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_3D,GL_TEXTURE_WRAP_R,GL_REPEAT);
-	GLubyte data[TEXTURE_SIZE*TEXTURE_SIZE*MAX_TEXTURES*4];
-	for(int i = 0; i<TEXTURE_SIZE*TEXTURE_SIZE*MAX_TEXTURES*4; i+=4){
-		data[i] = 255;
-		data[i+1] = 255;
-		data[i+2] = 255;
-		data[i+3] = 255;
-	}
-	glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA8, TEXTURE_SIZE, TEXTURE_SIZE, MAX_TEXTURES, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA8, TEXTURE_SIZE, TEXTURE_SIZE, MAX_TEXTURES, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 	AddTex(0,"textures/stone.png");
 	AddTex(1,"textures/dirt.png");
 	AddTex(3,"textures/grass.png");

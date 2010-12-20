@@ -132,6 +132,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>sfml-window-s.lib;sfml-system-s.lib;sfml-graphics-s.lib;sfml-audio-s.lib;sfml-network-s.lib;sfml-main.lib;opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <LargeAddressAware>true</LargeAddressAware>
+      <LinkTimeCodeGeneration>PGOptimization</LinkTimeCodeGeneration>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseDynamic|Win32'">

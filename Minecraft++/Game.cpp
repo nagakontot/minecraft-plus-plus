@@ -1,6 +1,10 @@
 #include "Global.h"
 
 bool Game::Active;
+double fps = 0;
+double tdelta = 0;
+double delta = 0;
+uint64_t ticks = 0;
 
 bool Game::Init() {
 	InitBlocks();
@@ -65,7 +69,13 @@ bool Game::Loop() {
 	}
 	//Display the screen
 	Window.Display();
-	cout << 1/Window.GetFrameTime() << endl;
+	fps = fps*0.8+0.2/Window.GetFrameTime();
+	tdelta += Window.GetFrameTime();
+	delta = Window.GetFrameTime();
+	ticks++;
+	if(ticks%10==0){
+		cout << fps << endl;
+	}
 	return Window.IsOpened();
 }
 void Game::Unload() {
