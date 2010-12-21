@@ -20,5 +20,5 @@ extern map<int64_t,map<int64_t,map<int64_t,Chunk*>>> ChunkPos;
 
 void ChunkUpdateThread();
 void AddChunkUpdate(Chunk* c);
-extern queue<Chunk*> ChunksToUpdate;
+extern deque<Chunk*> ChunksToUpdate;
 extern boost::mutex ChunkUpdate;
