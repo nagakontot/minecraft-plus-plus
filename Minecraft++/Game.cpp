@@ -51,21 +51,21 @@ bool Game::Loop() {
 	glClear(GL_COLOR_BUFFER_BIT);
 	glClear(GL_DEPTH_BUFFER_BIT);
 	//Draw everything
-	int range = 4;
-	glBindTexture(GL_TEXTURE_3D,TEX);
-	for(int64_t a=0;a<=range;a++){
-		for(int64_t b=0;b<=range;b++){
-			for(int64_t c=0;c<=range;c++){
-				GetChunk(player.pos.cx+a,player.pos.cy+b,player.pos.cz+c)->Draw();
-				if(a!=0){GetChunk(player.pos.cx-a,player.pos.cy+b,player.pos.cz+c)->Draw();}
-				if(b!=0){GetChunk(player.pos.cx+a,player.pos.cy-b,player.pos.cz+c)->Draw();}
-				if(c!=0){GetChunk(player.pos.cx+a,player.pos.cy+b,player.pos.cz-c)->Draw();}
-				if(a!=0 && b!=0){GetChunk(player.pos.cx-a,player.pos.cy-b,player.pos.cz+c)->Draw();}
-				if(b!=0 && c!=0){GetChunk(player.pos.cx+a,player.pos.cy-b,player.pos.cz-c)->Draw();}
-				if(c!=0 && a!=0){GetChunk(player.pos.cx-a,player.pos.cy+b,player.pos.cz-c)->Draw();}
-				if(a!=0 && b!=0 && c!=0){GetChunk(player.pos.cx-a,player.pos.cy-b,player.pos.cz-c)->Draw();}
+	int range = 5;
+	if(ticks%30==0){//Every so often run through and clean up the chunk list
+		Chunks.clear();
+		for(int64_t a=-range;a<=range;a++){
+			for(int64_t b=-range;b<=range;b++){
+				//for(int64_t c=0;c<=0;c++){
+				for(int64_t c=-range;c<=range;c++){
+					Chunks.push_back(GetChunk(player.pos.cx+a,player.pos.cy+b,player.pos.cz+c));
+				}
 			}
 		}
+	}
+	glBindTexture(GL_TEXTURE_3D,TEX);
+	for(auto i=Chunks.begin(); i!=Chunks.end(); i++){
+		(*i)->Draw();
 	}
 	//Display the screen
 	Window.Display();
@@ -74,7 +74,7 @@ bool Game::Loop() {
 	delta = Window.GetFrameTime();
 	ticks++;
 	if(ticks%10==0){
-		cout << fps << endl;
+		//cout << player.pos.cx << ", " << player.pos.cy << endl;
 	}
 	return Window.IsOpened();
 }

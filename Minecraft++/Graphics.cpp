@@ -50,7 +50,6 @@ GLuint GetTexture(string name) {
 	glGetIntegerv(GL_TEXTURE_BINDING_2D,t);
 	return *t;
 }
-
 uint8_t* GetPixels(string name) {
 	sf::Image* image = new sf::Image;
 	image->LoadFromFile(name);

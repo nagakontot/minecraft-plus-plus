@@ -8,7 +8,7 @@ Player::Player() {
 	pos.z = 8;
 	pos.cx = 0;
 	pos.cy = 0;
-	pos.cz = -1;
+	pos.cz = -5;
 	Window.SetCursorPosition(Window.GetWidth()/2,Window.GetHeight()/2);
 }
 
