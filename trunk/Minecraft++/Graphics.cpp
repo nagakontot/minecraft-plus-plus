@@ -27,8 +27,16 @@ void InitGraphics() {
 	glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA8, TEXTURE_SIZE, TEXTURE_SIZE, MAX_TEXTURES, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 	AddTex(0,"textures/stone.png");
 	AddTex(1,"textures/dirt.png");
+	AddTex(2,"textures/grass_side.png");
 	AddTex(3,"textures/grass.png");
-	AddTex(2,"textures/grass side.png");
+	AddTex(4,"textures/cobble.png");
+	AddTex(5,"textures/leaf.png");
+	AddTex(6,"textures/log.png");
+	AddTex(7,"textures/log_top.png");
+	AddTex(8,"textures/planks.png");
+	AddTex(9,"textures/gravel.png");
+	AddTex(10,"textures/sand.png");
+	AddTex(11,"textures/glass.png");
 }
 
 GLuint GetTexture(string name) {
