@@ -100,7 +100,7 @@ void InitBlocks() {
 	//Cobblestone
 	BlockTypes[4] = BlockType(true, 0, true, 1, &M_BLOCK[0], &T_COBBLE[0], 24);
 	//Leaves
-	BlockTypes[5] = BlockType(true, 200, false, 1, &M_BLOCK[0], &T_LEAVES[0], 24);
+	BlockTypes[5] = BlockType(true, 200, true, 1, &M_BLOCK[0], &T_LEAVES[0], 24);
 	//Logs
 	BlockTypes[6] = BlockType(true, 50, true, 1, &M_BLOCK[0], &T_LOGS[0], 24);
 	//Planks
@@ -110,5 +110,5 @@ void InitBlocks() {
 	//Sand
 	BlockTypes[9] = BlockType(true, 125, true, 1, &M_BLOCK[0], &T_SAND[0], 24);
 	//Glass
-	BlockTypes[10] = BlockType(true, 0, false, 1, &M_BLOCK[0], &T_GLASS[0], 24);
+	BlockTypes[10] = BlockType(true, 0, true, 1, &M_BLOCK[0], &T_GLASS[0], 24);
 }
