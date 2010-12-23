@@ -1,0 +1,6 @@
+Implement new map generation system
+Add water
+Mining and placing of blocks
+Multiplayer server
+Random spawn position
+Climates
