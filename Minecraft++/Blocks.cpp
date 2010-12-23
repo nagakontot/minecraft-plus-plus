@@ -87,7 +87,7 @@ BlockType::BlockType(bool _solid, uint8_t _porosity, bool _mineable, double _opa
 	tex = _tex;
 	verts = _verts;
 }
-
+// BlockType(Visible, Porosity, Mineable, Opacity, Model, Texture, Vertices);
 void InitBlocks() {
 	//Air
 	BlockTypes[0] = BlockType(true, 255, false, 0, 0, 0, 0);
@@ -97,4 +97,18 @@ void InitBlocks() {
 	BlockTypes[2] = BlockType(true, 20, true, 1, &M_BLOCK[0], &T_STONE[0], 24);
 	//Grass
 	BlockTypes[3] = BlockType(true, 100, true, 1, &M_BLOCK[0], &T_GRASS[0], 24);
+	//Cobblestone
+	BlockTypes[4] = BlockType(true, 0, true, 1, &M_BLOCK[0], &T_COBBLE[0], 24);
+	//Leaves
+	BlockTypes[5] = BlockType(true, 200, false, 1, &M_BLOCK[0], &T_LEAVES[0], 24);
+	//Logs
+	BlockTypes[6] = BlockType(true, 50, true, 1, &M_BLOCK[0], &T_LOGS[0], 24);
+	//Planks
+	BlockTypes[7] = BlockType(true, 100, true, 1, &M_BLOCK[0], &T_PLANKS[0], 24);
+	//Gravel
+	BlockTypes[8] = BlockType(true, 175, true, 1, &M_BLOCK[0], &T_GRAVEL[0], 24);
+	//Sand
+	BlockTypes[9] = BlockType(true, 125, true, 1, &M_BLOCK[0], &T_SAND[0], 24);
+	//Glass
+	BlockTypes[10] = BlockType(true, 0, false, 1, &M_BLOCK[0], &T_GLASS[0], 24);
 }
