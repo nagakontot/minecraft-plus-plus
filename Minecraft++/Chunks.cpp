@@ -1,6 +1,18 @@
 #include "Global.h"
+#include <ciso646>
 
-Chunk::Chunk(int64_t _x, int64_t _y, int64_t _z) {
+noise::module::Perlin gen2d;
+noise::module::Perlin gen3d;
+
+void InitGen() {
+	gen2d.SetFrequency(0.001);
+	gen2d.SetLacunarity(2);
+	gen2d.SetNoiseQuality(noise::QUALITY_BEST);
+	gen2d.SetOctaveCount(20);
+	gen2d.SetPersistence(0.5);
+}
+
+Chunk::Chunk(uint64_t _x, uint64_t _y, uint64_t _z) {
 	generated = false;
 	updated = false;
 	//Chunks.push_back(this);
@@ -20,52 +32,42 @@ Chunk::Chunk(int64_t _x, int64_t _y, int64_t _z) {
 	AddChunkUpdate(this);
 }
 
-int64_t GetSubGen(int64_t x, int64_t y, int64_t l, int64_t r) {
-	int64_t h = 0;
-	int64_t mx = x%l;
-	int64_t my = y%l;
-	int64_t s = 8;
-	if(x<0){mx=(x+1)%l+l-1;x-=l-1;}
-	if(y<0){my=(y+1)%l+l-1;y-=l-1;}
-	h += (random(x/l,y/l,r)%(2*s*l)-s*l)*(l-mx)*(l-my);
-	h += (random(x/l+1,y/l,r)%(2*s*l)-s*l)*(mx)*(l-my);
-	h += (random(x/l+1,y/l+1,r)%(2*s*l)-s*l)*(mx)*(my);
-	h += (random(x/l,y/l+1,r)%(2*s*l)-s*l)*(l-mx)*(my);
-	h /= l*l*2;
-	return h;
-}
-
-int64_t GetTotalGen(int64_t x, int64_t y) {
-	int64_t h = 0;
-	h += GetSubGen(x,y,1,1)+GetSubGen(x,y,1,6);
-	h += GetSubGen(x,y,2,2)+GetSubGen(x,y,2,7);
-	h += GetSubGen(x,y,4,3)+GetSubGen(x,y,4,8);
-	h += GetSubGen(x,y,8,4)+GetSubGen(x,y,8,9);
-	h += GetSubGen(x,y,16,5)+GetSubGen(x,y,16,10);
-	return h;
-}
-
 void Chunk::Generate() {
 	lock.lock();
 	//Map generation goes here =D
-	int64_t h1 = GetTotalGen(x,y);
-	int64_t h2 = GetTotalGen(x+1,y);
-	int64_t h3 = GetTotalGen(x+1,y+1);
-	int64_t h4 = GetTotalGen(x,y+1);
-	for(int a=0;a<16;a++){
-		for(int b=0;b<16;b++){
-			for(int c=0;c<16;c++){
-				int i = a*256+b*16+c;
-				int64_t h = (h1*(16-a)*(16-b)+h2*a*(16-b)+h3*a*b+h4*(16-a)*b)/256;
-				h += (random(a,b,x,y,1)%4+random(a,b,x,y,2)%4+random(a,b,x,y,3)%4)/4;
-				if(c+z*16<h){
+	for(uint8_t a=0;a<16;a++){
+		for(uint8_t b=0;b<16;b++){
+			double cx, cy;
+			if(x/0x10000000%2==1){
+				cx = ((x&0xfffffff)<<4)+a;
+			} else {
+				cx = 0x100000000-(((x&0xfffffff)<<4)+a);
+			}
+			if(y/0x10000000%2==1){
+				cy = ((y&0xfffffff)<<4)+b;
+			} else {
+				cy = 0x100000000-(((y&0xfffffff)<<4)+b);
+			}
+			double hd = gen2d.GetValue(cx,cy,0);
+			double o = gen2d.GetValue(x>>16,y>>16,1000);
+			hd += o;
+			int64_t r = hd*0x80;
+			int64_t rz;
+			if(z>=INT64_MAX){
+				rz = z-INT64_MAX;
+			} else {
+				rz = -(INT64_MAX-z);
+			}
+			for(uint8_t c=0;c<16;c++){
+				int64_t bz = rz*16+c;
+				int64_t d = bz-r;
+				uint16_t i = a*256+b*16+c;
+				if(d>0){
 					Blocks[i].type = 0;
-				} else if(c+z*16<h+1){
-					Blocks[i].type = 3;
-				} else if(c+z*16<h+4){
+				} else if(d<0){
 					Blocks[i].type = 1;
 				} else {
-					Blocks[i].type = 2;
+					Blocks[i].type = 3;
 				}
 			}
 		}
@@ -77,37 +79,49 @@ void Chunk::Generate() {
 		if(c!=0){
 			c->xp = this;
 			xn = c;
-			AddChunkUpdate(c);
+			if(c->generated){
+				c->Update();
+			}
 		}
 		c = GetChunk(x+1,y,z,false);
 		if(c!=0){
 			c->xn = this;
 			xp = c;
-			AddChunkUpdate(c);
+			if(c->generated){
+				c->Update();
+			}
 		}
 		c = GetChunk(x,y-1,z,false);
 		if(c!=0){
 			c->yp = this;
 			yn = c;
-			AddChunkUpdate(c);
+			if(c->generated){
+				c->Update();
+			}
 		}
 		c = GetChunk(x,y+1,z,false);
 		if(c!=0){
 			c->yn = this;
 			yp = c;
-			AddChunkUpdate(c);
+			if(c->generated){
+				c->Update();
+			}
 		}
 		c = GetChunk(x,y,z-1,false);
 		if(c!=0){
 			c->zp = this;
 			zn = c;
-			AddChunkUpdate(c);
+			if(c->generated){
+				c->Update();
+			}
 		}
 		c = GetChunk(x,y,z+1,false);
 		if(c!=0){
 			c->zn = this;
 			zp = c;
-			AddChunkUpdate(c);
+			if(c->generated){
+				c->Update();
+			}
 		}
 	}
 	generated = true;
@@ -158,22 +172,45 @@ void Chunk::Update() {
 	tex = ntex;
 	updated = true;
 	lock.unlock();
+	ChunkUpdate.lock();
+	remove(ChunksToUpdate.begin(),ChunksToUpdate.end(),this);
+	ChunkUpdate.unlock();
 }
 
 const void Chunk::Draw() {
-	if(lock.try_lock()){
-		if(generated && updated){
+	if(generated && updated){
+		if(lock.try_lock()){
 			glLoadIdentity();
-			glTranslated(-16*(player.pos.cx-x), -16*(player.pos.cy-y), -16*(player.pos.cz-z));
+			int64_t dx, dy, dz;
+			if(player.pos.cx>x){
+				dx = player.pos.cx-x;
+			} else {
+				dx = x-player.pos.cx;
+				dx = -dx;
+			}
+			if(player.pos.cy>y){
+				dy = player.pos.cy-y;
+			} else {
+				dy = y-player.pos.cy;
+				dy = -dy;
+			}
+			if(player.pos.cz>z){
+				dz = player.pos.cz-z;
+			} else {
+				dz = z-player.pos.cz;
+				dz = -dz;
+			}
+			glTranslated(-16*dx, -16*dy, -16*dz);
 			glTexCoordPointer(3,GL_FLOAT,0,tex);
 			glVertexPointer(3,GL_FLOAT,0,model);
 			glDrawArrays(GL_QUADS,0,verts);
+			glFlush();
+			lock.unlock();
 		}
-		lock.unlock();
 	}
 }
 
-Chunk* GetChunk(int64_t x, int64_t y, int64_t z, bool generate) {
+Chunk* GetChunk(uint64_t x, uint64_t y, uint64_t z, bool generate) {
 	Chunk* c = ChunkPos[x][y][z];
 	if(c!=0){
 		return c;
@@ -185,7 +222,7 @@ Chunk* GetChunk(int64_t x, int64_t y, int64_t z, bool generate) {
 }
 
 vector<Chunk*> Chunks;
-map<int64_t,map<int64_t,map<int64_t,Chunk*>>> ChunkPos;
+map<uint64_t,map<uint64_t,map<uint64_t,Chunk*>>> ChunkPos;
 
 void ChunkUpdateThread() {
 	while(true){

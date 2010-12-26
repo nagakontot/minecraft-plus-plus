@@ -6,8 +6,8 @@ struct Block{
 	uint8_t light;
 	uint8_t extra;
 	Block();
-	const void Draw(int x, int y, int z);
-	void Update(int x, int y, int z, struct Chunk* chunk);
+	const void Draw(int8_t x, int8_t y, int8_t z);
+	void Update(int8_t x, int8_t y, int8_t z, struct Chunk* chunk);
 };
 
 struct BlockType{
@@ -26,6 +26,6 @@ extern BlockType BlockTypes[100];
 
 void InitBlocks();
 
-Block* GetBlock(int x, int y, int z, Chunk*& chunk);
+Block* GetBlock(int8_t x, int8_t y, int8_t z, Chunk*& chunk);
 
-bool BlockVisible(int x, int y, int z, Chunk* chunk);
+bool BlockVisible(int8_t x, int8_t y, int8_t z, Chunk* chunk);
