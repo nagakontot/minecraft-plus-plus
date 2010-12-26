@@ -9,7 +9,7 @@ Block::Block() {
 	extra = 0;
 }
 
-Block* GetBlock(int x, int y, int z, Chunk*& chunk) {
+Block* GetBlock(int8_t x, int8_t y, int8_t z, Chunk*& chunk) {
 	if(x<0){
 		chunk = chunk->xn;
 		x += 16;
@@ -43,7 +43,7 @@ Block* GetBlock(int x, int y, int z, Chunk*& chunk) {
 	return &(chunk->Blocks[x*256+y*16+z]);
 }
 
-const void Block::Draw(int x, int y, int z) {
+const void Block::Draw(int8_t x, int8_t y, int8_t z) {
 	if(!extra&1){return;}
 	const BlockType& t = BlockTypes[type];
 	if(t.verts==0){return;}
@@ -55,13 +55,13 @@ const void Block::Draw(int x, int y, int z) {
 	glPopMatrix();
 }
 
-bool BlockVisible(int x, int y, int z, Chunk* chunk) {
+bool BlockVisible(int8_t x, int8_t y, int8_t z, Chunk* chunk) {
 	Block* b = GetBlock(x, y, z, chunk);
 	if(b==0){return false;}
 	return BlockTypes[b->type].opacity<1;
 }
 
-void Block::Update(int x, int y, int z, Chunk* chunk) {
+void Block::Update(int8_t x, int8_t y, int8_t z, Chunk* chunk) {
 	extra = extra>>1<<1;
 	extra |= BlockVisible(x+1,y,z,chunk);
 	extra |= BlockVisible(x-1,y,z,chunk);

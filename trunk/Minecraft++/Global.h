@@ -10,6 +10,9 @@
 #include <boost/filesystem.hpp>
 #include <boost/thread.hpp>
 
+//And other stuff too
+#include <noise/noise.h>
+
 //STL
 #include <iostream>
 #include <fstream>
@@ -17,6 +20,7 @@
 #include <cmath>
 #include <map>
 #include <cstdint>
+#define UINT64_HALF 0x8000000000000000ULL
 #include <random>
 #include <functional>
 #include <queue>
@@ -27,6 +31,7 @@ using namespace std;
 #include "Position.h"
 #include "Rotation.h"
 #include "Graphics.h"
+#include "Clouds.h"
 #include "Models.h"
 #include "Blocks.h"
 #include "Chunks.h"

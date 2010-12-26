@@ -8,6 +8,7 @@ uint64_t ticks = 0;
 
 bool Game::Init() {
 	InitBlocks();
+	InitGen();
 	Window.Create(sf::VideoMode(800,600,32),"Minecraft++",sf::Style::Close|sf::Style::Titlebar,sf::ContextSettings(24,0,0,3,3));
 	Window.ShowMouseCursor(false);
 	//Window.SetFramerateLimit(30);
@@ -51,14 +52,14 @@ bool Game::Loop() {
 	glClear(GL_COLOR_BUFFER_BIT);
 	glClear(GL_DEPTH_BUFFER_BIT);
 	//Draw everything
-	int range = 5;
+	uint8_t range = 5;
 	if(ticks%30==0){//Every so often run through and clean up the chunk list
 		Chunks.clear();
-		for(int64_t a=-range;a<=range;a++){
-			for(int64_t b=-range;b<=range;b++){
+		for(uint8_t a=0;a<=range*2;a++){
+			for(uint8_t b=0;b<=range*2;b++){
 				//for(int64_t c=0;c<=0;c++){
-				for(int64_t c=-range;c<=range;c++){
-					Chunks.push_back(GetChunk(player.pos.cx+a,player.pos.cy+b,player.pos.cz+c));
+				for(uint8_t c=0;c<=range*2;c++){
+					Chunks.push_back(GetChunk(player.pos.cx+a-range,player.pos.cy+b-range,player.pos.cz+c-range));
 				}
 			}
 		}

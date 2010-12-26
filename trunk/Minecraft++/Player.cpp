@@ -6,9 +6,9 @@ Player::Player() {
 	pos.x = 8;
 	pos.y = 8;
 	pos.z = 8;
-	pos.cx = 0;
-	pos.cy = 0;
-	pos.cz = -5;
+	pos.cx = (uint64_t(random(rand()))<<32)+random(rand());
+	pos.cy = (uint64_t(random(rand()))<<32)+random(rand());
+	pos.cz = UINT64_HALF;
 	Window.SetCursorPosition(Window.GetWidth()/2,Window.GetHeight()/2);
 }
 
@@ -44,4 +44,5 @@ void Player::Step() {
 		}
 	}
 	pos.Update();
+	//cout << pos.z << ", " << pos.cz << endl;
 }

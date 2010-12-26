@@ -1,5 +1,5 @@
 struct Chunk {
-	int64_t x, y, z;
+	uint64_t x, y, z;
 	Chunk *xp, *xn, *yp, *yn, *zp, *zn;
 	Block Blocks[4096];
 	GLfloat *model, *tex;
@@ -7,17 +7,18 @@ struct Chunk {
 	boost::mutex lock;
 	bool generated;
 	bool updated;
-	Chunk(int64_t x, int64_t y, int64_t z);
+	Chunk(uint64_t x, uint64_t y, uint64_t z);
 	const void Draw();
 	void Update();
 	void Generate();
 };
 
-Chunk* GetChunk(int64_t x, int64_t y, int64_t z, bool generate = true);
+Chunk* GetChunk(uint64_t x, uint64_t y, uint64_t z, bool generate = true);
 
 extern vector<Chunk*> Chunks;
-extern map<int64_t,map<int64_t,map<int64_t,Chunk*>>> ChunkPos;
+extern map<uint64_t,map<uint64_t,map<uint64_t,Chunk*>>> ChunkPos;
 
+void InitGen();
 void ChunkUpdateThread();
 void AddChunkUpdate(Chunk* c);
 extern deque<Chunk*> ChunksToUpdate;
