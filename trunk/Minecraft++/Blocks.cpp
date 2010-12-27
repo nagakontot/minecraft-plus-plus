@@ -58,17 +58,29 @@ const void Block::Draw(int8_t x, int8_t y, int8_t z) {
 bool BlockVisible(int8_t x, int8_t y, int8_t z, Chunk* chunk) {
 	Block* b = GetBlock(x, y, z, chunk);
 	if(b==0){return false;}
-	return BlockTypes[b->type].opacity<1;
+	if(!chunk->generated){return false;}
+	return !(BlockTypes[b->type].opaque);
 }
 
 void Block::Update(int8_t x, int8_t y, int8_t z, Chunk* chunk) {
-	extra = extra>>1<<1;
-	extra |= BlockVisible(x+1,y,z,chunk);
-	extra |= BlockVisible(x-1,y,z,chunk);
-	extra |= BlockVisible(x,y+1,z,chunk);
-	extra |= BlockVisible(x,y-1,z,chunk);
-	extra |= BlockVisible(x,y,z+1,chunk);
-	extra |= BlockVisible(x,y,z-1,chunk);
+	if(!(extra>>7)){
+		extra >>= 8;
+		extra = 1;
+		extra <<= 1;
+		extra |= BlockVisible(x+1,y,z,chunk);
+		extra <<= 1;
+		extra |= BlockVisible(x-1,y,z,chunk);
+		extra <<= 1;
+		extra |= BlockVisible(x,y+1,z,chunk);
+		extra <<= 1;
+		extra |= BlockVisible(x,y-1,z,chunk);
+		extra <<= 1;
+		extra |= BlockVisible(x,y,z+1,chunk);
+		extra <<= 1;
+		extra |= BlockVisible(x,y,z-1,chunk);
+		extra <<= 1;
+		extra |= bool(extra<<1);
+	}
 }
 
 BlockType BlockTypes[100];
@@ -78,11 +90,11 @@ BlockType::BlockType() {
 	porosity = 0;
 }
 
-BlockType::BlockType(bool _solid, uint8_t _porosity, bool _mineable, double _opacity, const GLfloat* _model, const GLfloat* _tex, uint16_t _verts) {
+BlockType::BlockType(bool _solid, uint8_t _porosity, bool _mineable, bool _opaque, const GLfloat* _model, const GLfloat* _tex, uint16_t _verts) {
 	solid = _solid;
 	porosity = _porosity;
 	mineable = _mineable;
-	opacity = _opacity;
+	opaque = _opaque;
 	model = _model;
 	tex = _tex;
 	verts = _verts;
@@ -90,25 +102,25 @@ BlockType::BlockType(bool _solid, uint8_t _porosity, bool _mineable, double _opa
 // BlockType(Visible, Porosity, Mineable, Opacity, Model, Texture, Vertices);
 void InitBlocks() {
 	//Air
-	BlockTypes[0] = BlockType(true, 255, false, 0, 0, 0, 0);
+	BlockTypes[0] = BlockType(false, 255, false, false, 0, 0, 0);
 	//Dirt
-	BlockTypes[1] = BlockType(true, 100, true, 1, &M_BLOCK[0], &T_DIRT[0], 24);
+	BlockTypes[1] = BlockType(true, 100, true, true, 0, &T_DIRT[0], 24);
 	//Stone
-	BlockTypes[2] = BlockType(true, 20, true, 1, &M_BLOCK[0], &T_STONE[0], 24);
+	BlockTypes[2] = BlockType(true, 20, true, true, 0, &T_STONE[0], 24);
 	//Grass
-	BlockTypes[3] = BlockType(true, 100, true, 1, &M_BLOCK[0], &T_GRASS[0], 24);
+	BlockTypes[3] = BlockType(true, 100, true, true, 0, &T_GRASS[0], 24);
 	//Cobblestone
-	BlockTypes[4] = BlockType(true, 0, true, 1, &M_BLOCK[0], &T_COBBLE[0], 24);
+	BlockTypes[4] = BlockType(true, 0, true, true, 0, &T_COBBLE[0], 24);
 	//Leaves
-	BlockTypes[5] = BlockType(true, 200, true, 1, &M_BLOCK[0], &T_LEAVES[0], 24);
+	BlockTypes[5] = BlockType(true, 200, true, false, 0, &T_LEAVES[0], 24);
 	//Logs
-	BlockTypes[6] = BlockType(true, 50, true, 1, &M_BLOCK[0], &T_LOGS[0], 24);
+	BlockTypes[6] = BlockType(true, 50, true, true, 0, &T_LOGS[0], 24);
 	//Planks
-	BlockTypes[7] = BlockType(true, 100, true, 1, &M_BLOCK[0], &T_PLANKS[0], 24);
+	BlockTypes[7] = BlockType(true, 100, true, true, 0, &T_PLANKS[0], 24);
 	//Gravel
-	BlockTypes[8] = BlockType(true, 175, true, 1, &M_BLOCK[0], &T_GRAVEL[0], 24);
+	BlockTypes[8] = BlockType(true, 175, true, true, 0, &T_GRAVEL[0], 24);
 	//Sand
-	BlockTypes[9] = BlockType(true, 125, true, 1, &M_BLOCK[0], &T_SAND[0], 24);
+	BlockTypes[9] = BlockType(true, 125, true, true, 0, &T_SAND[0], 24);
 	//Glass
-	BlockTypes[10] = BlockType(true, 0, true, 1, &M_BLOCK[0], &T_GLASS[0], 24);
+	BlockTypes[10] = BlockType(true, 0, true, false, 0, &T_GLASS[0], 24);
 }

@@ -1,6 +1,7 @@
 #include "Global.h"
 
-bool Game::Active;
+bool Game::Active = true;
+boost::thread Thread(ChunkUpdateThread);
 double fps = 0;
 double tdelta = 0;
 double delta = 0;
@@ -14,8 +15,6 @@ bool Game::Init() {
 	//Window.SetFramerateLimit(30);
 	InitGraphics();
 	Window.SetActive();
-	Active = true;
-	boost::thread thread(ChunkUpdateThread);
 	srand(clock());
 	return true;
 }
@@ -80,5 +79,8 @@ bool Game::Loop() {
 	return Window.IsOpened();
 }
 void Game::Unload() {
-
+	Active = false;
+	while(!ChunkThreadDone){
+		sf::Sleep(0.01);
+	}
 }
