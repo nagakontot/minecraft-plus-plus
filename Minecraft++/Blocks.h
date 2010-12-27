@@ -12,11 +12,11 @@ struct Block{
 
 struct BlockType{
 	BlockType();
-	BlockType(bool solid, uint8_t porosity, bool mineable, double opacity, const GLfloat* model, const GLfloat* tex, uint16_t verts);
+	BlockType(bool solid, uint8_t porosity, bool mineable, bool opaque, const GLfloat* model, const GLfloat* tex, uint16_t verts);
 	bool solid;
 	uint8_t porosity;
 	bool mineable;
-	double opacity;
+	bool opaque;
 	const GLfloat* model;
 	const GLfloat* tex;
 	uint16_t verts;

@@ -5,4 +5,5 @@ namespace Game {
 	bool Loop();
 	void Unload();
 	extern bool Active;
+	extern boost::thread Thread;
 };

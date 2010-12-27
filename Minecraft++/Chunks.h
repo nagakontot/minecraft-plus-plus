@@ -23,3 +23,4 @@ void ChunkUpdateThread();
 void AddChunkUpdate(Chunk* c);
 extern deque<Chunk*> ChunksToUpdate;
 extern boost::mutex ChunkUpdate;
+extern bool ChunkThreadDone;
