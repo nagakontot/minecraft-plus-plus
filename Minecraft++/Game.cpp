@@ -58,7 +58,6 @@ bool Game::Loop() {
 		Chunks.clear();
 		for(uint8_t a=0;a<=range*2;a++){
 			for(uint8_t b=0;b<=range*2;b++){
-				//for(int64_t c=0;c<=0;c++){
 				for(uint8_t c=0;c<=range*2;c++){
 					Chunks.push_back(GetChunk(player.pos.cx+a-range,player.pos.cy+b-range,player.pos.cz+c-range));
 				}
@@ -76,7 +75,7 @@ bool Game::Loop() {
 	delta = Window.GetFrameTime();
 	ticks++;
 	if(ticks%10==0){
-		//cout << player.pos.cx << ", " << player.pos.cy << endl;
+		cout << fps << endl;
 	}
 	return Window.IsOpened();
 }
