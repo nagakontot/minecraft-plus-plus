@@ -61,9 +61,9 @@ void Chunk::Generate() {
 				int64_t d = bz-r;
 				uint16_t i = a*256+b*16+c;
 				if(d>0){
-					Blocks[i].type = 0;
-				} else if(d<0){
 					Blocks[i].type = 1;
+				} else if(d<0){
+					Blocks[i].type = 0;
 				} else {
 					Blocks[i].type = 3;
 				}

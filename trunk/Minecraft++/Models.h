@@ -14,7 +14,7 @@ void InitModels();
 const GLfloat T_QUAD[8] =	{1,0,0,0,0,1,1,1};
 const GLfloat T_STONE[6] =	{0,0,0,0,0,0};
 const GLfloat T_DIRT[6] =	{1,1,1,1,1,1};
-const GLfloat T_GRASS[6] =	{2,2,2,2,3,1};
+const GLfloat T_GRASS[6] =	{2,2,2,2,1,3};
 const GLfloat T_COBBLE[6] = {4,4,4,4,4,4};
 const GLfloat T_LEAVES[6] = {5,5,5,5,5,5};
 const GLfloat T_LOGS[6] =	{6,6,6,6,7,7};

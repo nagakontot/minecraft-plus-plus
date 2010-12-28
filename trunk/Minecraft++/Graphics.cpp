@@ -16,7 +16,7 @@ void InitGraphics() {
 	glEnable(GL_ALPHA_TEST);
 	glAlphaFunc(GL_GREATER,0);
 	glEnable(GL_CULL_FACE);
-	glCullFace(GL_FRONT);
+	glCullFace(GL_BACK);
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 	glGenTextures(1,&TEX);

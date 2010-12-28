@@ -44,5 +44,4 @@ void Player::Step() {
 		}
 	}
 	pos.Update();
-	//cout << pos.z << ", " << pos.cz << endl;
 }
