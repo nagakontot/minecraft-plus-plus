@@ -78,7 +78,7 @@ void Chunk::Generate() {
 			c->xp = this;
 			xn = c;
 			if(c->generated){
-				AddChunkUpdate(c);
+				c->AddUpdate(15,0,0,15,15,15);
 			}
 		}
 		c = GetChunk(x+1,y,z,false);
@@ -86,7 +86,7 @@ void Chunk::Generate() {
 			c->xn = this;
 			xp = c;
 			if(c->generated){
-				AddChunkUpdate(c);
+				c->AddUpdate(0,0,0,0,15,15);
 			}
 		}
 		c = GetChunk(x,y-1,z,false);
@@ -94,7 +94,7 @@ void Chunk::Generate() {
 			c->yp = this;
 			yn = c;
 			if(c->generated){
-				AddChunkUpdate(c);
+				c->AddUpdate(0,15,0,15,15,15);
 			}
 		}
 		c = GetChunk(x,y+1,z,false);
@@ -102,7 +102,7 @@ void Chunk::Generate() {
 			c->yn = this;
 			yp = c;
 			if(c->generated){
-				AddChunkUpdate(c);
+				c->AddUpdate(0,0,0,15,0,15);
 			}
 		}
 		c = GetChunk(x,y,z-1,false);
@@ -110,7 +110,7 @@ void Chunk::Generate() {
 			c->zp = this;
 			zn = c;
 			if(c->generated){
-				AddChunkUpdate(c);
+				c->AddUpdate(0,0,15,15,15,15);
 			}
 		}
 		c = GetChunk(x,y,z+1,false);
@@ -118,11 +118,12 @@ void Chunk::Generate() {
 			c->zn = this;
 			zp = c;
 			if(c->generated){
-				AddChunkUpdate(c);
+				c->AddUpdate(0,0,0,15,15,0);
 			}
 		}
 	}
 	generated = true;
+	AddChunkUpdate(this);
 	lock.unlock();
 }
 
@@ -224,10 +225,18 @@ void Chunk::Update() {
 	model = nmodel;
 	tex = ntex;
 	updated = true;
-	ChunkUpdate.lock();
-	remove(ChunksToUpdate.begin(),ChunksToUpdate.end(),this);
-	ChunkUpdate.unlock();
 	lock.unlock();
+}
+
+void Chunk::AddUpdate(uint8_t x1, uint8_t y1, uint8_t z1, uint8_t x2, uint8_t y2, uint8_t z2) {
+	for(uint8_t a=x1;a<=x2;a++){
+		for(uint8_t b=y1;b<=y2;b++){
+			for(uint8_t c=z1;c<=z2;c++){
+				Blocks[a*256+b*16+c].extra &= 0x7f;
+			}
+		}
+	}
+	AddChunkUpdate(this);
 }
 
 const void Chunk::Draw() {
@@ -278,19 +287,20 @@ vector<Chunk*> Chunks;
 map<uint64_t,map<uint64_t,map<uint64_t,Chunk*>>> ChunkPos;
 
 void ChunkUpdateThread() {
-	while(Game::Active){
+	while(!Game::Done){
 		if(ChunksToUpdate.empty()){
-			sf::Sleep(0.1);
+			sf::Sleep(0.01);
 		} else {
 			ChunkUpdate.lock();
-			Chunk* c = ChunksToUpdate.front();
-			ChunksToUpdate.pop_front();
-			remove(ChunksToUpdate.begin(),ChunksToUpdate.end(),c);
+			auto it = ChunksToUpdate.begin();
+			Chunk* c = *it;
+			ChunksToUpdate.erase(it);
 			ChunkUpdate.unlock();
 			if(!c->generated){
 				c->Generate();
+			} else {
+				c->Update();
 			}
-			c->Update();
 		}
 	}
 	ChunkThreadDone = true;
@@ -298,10 +308,10 @@ void ChunkUpdateThread() {
 
 void AddChunkUpdate(Chunk* c) {
 	ChunkUpdate.lock();
-	ChunksToUpdate.push_back(c);
+	ChunksToUpdate.insert(c);
 	ChunkUpdate.unlock();
 }
 
-deque<Chunk*> ChunksToUpdate;
+unordered_set<Chunk*> ChunksToUpdate;
 boost::mutex ChunkUpdate;
 bool ChunkThreadDone = false;

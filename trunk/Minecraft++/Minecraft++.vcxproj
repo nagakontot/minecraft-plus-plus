@@ -156,7 +156,7 @@
   <ItemGroup>
     <ClCompile Include="Blocks.cpp" />
     <ClCompile Include="Chunks.cpp" />
-    <ClCompile Include="Clouds.cpp" />
+    <ClCompile Include="Sky.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -167,7 +167,7 @@
   <ItemGroup>
     <ClInclude Include="Blocks.h" />
     <ClInclude Include="Chunks.h" />
-    <ClInclude Include="Clouds.h" />
+    <ClInclude Include="Sky.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Global.h" />
     <ClInclude Include="Graphics.h" />
