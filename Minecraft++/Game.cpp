@@ -1,6 +1,7 @@
 #include "Global.h"
 
 bool Game::Active = true;
+bool Game::Done = false;
 boost::thread Thread(ChunkUpdateThread);
 double fps = 0;
 double tdelta = 0;
@@ -49,9 +50,10 @@ bool Game::Loop() {
 	glMatrixMode(GL_MODELVIEW);
 	//Clear the screen
 	glClear(GL_COLOR_BUFFER_BIT);
+	//SkyDraw();
 	glClear(GL_DEPTH_BUFFER_BIT);
 	//Draw everything
-	uint8_t range = 5;
+	uint8_t range = 10;
 	if(ticks%30==0){//Every so often run through and clean up the chunk list
 		Chunks.clear();
 		for(uint8_t a=0;a<=range*2;a++){
@@ -79,7 +81,7 @@ bool Game::Loop() {
 	return Window.IsOpened();
 }
 void Game::Unload() {
-	Active = false;
+	Done = true;
 	while(!ChunkThreadDone){
 		sf::Sleep(0.01);
 	}

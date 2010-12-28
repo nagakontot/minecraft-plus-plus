@@ -24,6 +24,7 @@
 #include <random>
 #include <functional>
 #include <queue>
+#include <unordered_set>
 using namespace std;
 
 //Our own headers
@@ -31,7 +32,7 @@ using namespace std;
 #include "Position.h"
 #include "Rotation.h"
 #include "Graphics.h"
-#include "Clouds.h"
+#include "Sky.h"
 #include "Models.h"
 #include "Blocks.h"
 #include "Chunks.h"
