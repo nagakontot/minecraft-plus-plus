@@ -99,7 +99,7 @@ BlockType::BlockType(bool _solid, uint8_t _porosity, bool _mineable, bool _opaqu
 	tex = _tex;
 	verts = _verts;
 }
-// BlockType(Visible, Porosity, Mineable, Opacity, Model, Texture, Vertices);
+// BlockType(Solid, Porosity, Mineable, Opaque, Model (leave 0 for standard block), Texture, Vertices);
 void InitBlocks() {
 	//Air
 	BlockTypes[0] = BlockType(false, 255, false, false, 0, 0, 0);

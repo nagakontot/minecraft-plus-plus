@@ -1,9 +1,8 @@
-Add different terrain type for map generation
-Add water block to fill up low areas
+Add different terrain type for map generation.
+Add water block to fill up low areas.
 Mining and placing of blocks. Something with octrees?
-Multiplayer server. Deal with this later when Alex gets enough experience
-Saving and loading of chunks
-Tesselate only the faces of blocks that are visible to optimize drawing.
+Multiplayer server. Deal with this later when Alex gets enough experience.
+Saving and loading of chunks.
 Cave generation eventually.
-Player physics.
-Redo the whole update thread system.
+Redo player movement.
+Redo a bunch of stuff.

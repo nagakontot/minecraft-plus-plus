@@ -1,4 +1,4 @@
-
+extern double delta;
 
 namespace Game {
 	bool Init();
