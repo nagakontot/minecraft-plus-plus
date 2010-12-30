@@ -46,7 +46,7 @@ bool Game::Loop() {
 	glLoadIdentity();
 	gluPerspective(60,(double)Window.GetWidth()/Window.GetHeight(),0.1,1000);
 	gluLookAt(0,0,0,ldx(1,player.rot.d)*ldx(1,player.rot.p),ldy(1,player.rot.d)*ldx(1,player.rot.p),ldy(1,player.rot.p),0,0,-1);
-	glTranslated(-player.pos.x,-player.pos.y,-player.pos.z);
+	glTranslated(-player.pos.x,-player.pos.y,-player.pos.z+player.eyeh);
 	glMatrixMode(GL_MODELVIEW);
 	//Clear the screen
 	glClear(GL_COLOR_BUFFER_BIT);
