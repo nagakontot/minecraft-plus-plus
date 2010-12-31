@@ -124,3 +124,18 @@ void InitBlocks() {
 	//Glass
 	BlockTypes[10] = BlockType(true, 0, true, false, 0, &T_GLASS[0], 24);
 }
+#define BUPDATE(X,Y,Z)	c = chunk;\
+						b = GetBlock(x+X,y+Y,z+Z,c);\
+						b->extra = 0;\
+						AddChunkUpdate(c);
+void AddBlockUpdate(int8_t x, int8_t y, int8_t z, Chunk* chunk) {
+	Block* b;
+	Chunk* c;
+	BUPDATE(0,0,0);
+	BUPDATE(1,0,0);
+	BUPDATE(-1,0,0);
+	BUPDATE(0,1,0);
+	BUPDATE(0,-1,0);
+	BUPDATE(0,0,1);
+	BUPDATE(0,0,-1);
+}

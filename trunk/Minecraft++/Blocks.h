@@ -29,3 +29,4 @@ void InitBlocks();
 Block* GetBlock(int8_t x, int8_t y, int8_t z, Chunk*& chunk);
 
 bool BlockVisible(int8_t x, int8_t y, int8_t z, Chunk* chunk);
+void AddBlockUpdate(int8_t x, int8_t y, int8_t z, Chunk* chunk);
