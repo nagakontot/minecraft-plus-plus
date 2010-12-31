@@ -80,97 +80,97 @@ void Player::Step() {
 	pos.x += vx*delta;
 	pos.y += vy*delta;
 	pos.z += vz*delta;
-#define CHECK_Z	if(floor(pos.z)>floor(oz)){\
-					for(int8_t z=floor(oz)+1;z<=floor(pos.z);z++){\
-						Block* b = GetBlock(ox,oy,z,c);\
-						if(b==0){\
-							vz = 0;\
-							pos.z = oz;\
-						} else {\
-							BlockType t = BlockTypes[b->type];\
-							if(t.solid){\
-								vz = 0;\
-								pos.z = oz;\
-								onground = true;\
-							}\
-						}\
-					}\
-				} else if(floor(pos.z-height)<floor(oz-height)){\
-					for(int8_t z=floor(oz-height)-1;z>=floor(pos.z-height);z--){\
-						Block* b = GetBlock(ox,oy,z,c);\
-						if(b==0){\
-							vz = 0;\
-							pos.z = oz;\
-						} else {\
-							BlockType t = BlockTypes[b->type];\
-							if(t.solid){\
-								vz = 0;\
-								pos.z = oz;\
-							}\
-						}\
-					}\
-				}
-#define CHECK_Y	if(floor(pos.y+width)>floor(oy+width)){\
-					for(int8_t y=floor(oy+width)+1;y<=floor(pos.y+width);y++){\
-						Block* b = GetBlock(ox,y,oz,c);\
-						if(b==0){\
-							vy = 0;\
-							pos.y = oy;\
-						} else {\
-							BlockType t = BlockTypes[b->type];\
-							if(t.solid){\
-								vy = 0;\
-								pos.y = oy;\
-							}\
-						}\
-					}\
-				} else if(floor(pos.y-width)<floor(oy-width)){\
-					for(int8_t y=floor(oy-width)-1;y>=floor(pos.y-width);y--){\
-						Block* b = GetBlock(ox,y,oz,c);\
-						if(b==0){\
-							vy = 0;\
-							pos.y = oy;\
-						} else {\
-							BlockType t = BlockTypes[b->type];\
-							if(t.solid){\
-								vy = 0;\
-								pos.y = oy;\
-							}\
-						}\
-					}\
-				}
-#define CHECK_X	if(floor(pos.x+width)>floor(ox+width)){\
-					for(int8_t x=floor(ox+width)+1;x<=floor(pos.x+width);x++){\
-						Block* b = GetBlock(x,oy,oz,c);\
-						if(b==0){\
-							vx = 0;\
-							pos.x = ox;\
-						} else {\
-							BlockType t = BlockTypes[b->type];\
-							if(t.solid){\
-								vx = 0;\
-								pos.x = ox;\
-							}\
-						}\
-					}\
-				} else if(floor(pos.x-width)<floor(ox-width)){\
-					for(int8_t x=floor(ox-width)-1;x>=floor(pos.x-width);x--){\
-						Block* b = GetBlock(x,oy,oz,c);\
-						if(b==0){\
-							vx = 0;\
-							pos.x = ox;\
-						} else {\
-							BlockType t = BlockTypes[b->type];\
-							if(t.solid){\
-								vx = 0;\
-								pos.x = ox;\
-							}\
-						}\
-					}\
-				}
-	onground = false;
-	CHECK_X;
-	CHECK_Y;
-	CHECK_Z;
+//#define CHECK_Z	if(floor(pos.z)>floor(oz)){\
+//					for(int8_t z=floor(oz)+1;z<=floor(pos.z);z++){\
+//						Block* b = GetBlock(ox,oy,z,c);\
+//						if(b==0){\
+//							vz = 0;\
+//							pos.z = oz;\
+//						} else {\
+//							BlockType t = BlockTypes[b->type];\
+//							if(t.solid){\
+//								vz = 0;\
+//								pos.z = oz;\
+//								onground = true;\
+//							}\
+//						}\
+//					}\
+//				} else if(floor(pos.z-height)<floor(oz-height)){\
+//					for(int8_t z=floor(oz-height)-1;z>=floor(pos.z-height);z--){\
+//						Block* b = GetBlock(ox,oy,z,c);\
+//						if(b==0){\
+//							vz = 0;\
+//							pos.z = oz;\
+//						} else {\
+//							BlockType t = BlockTypes[b->type];\
+//							if(t.solid){\
+//								vz = 0;\
+//								pos.z = oz;\
+//							}\
+//						}\
+//					}\
+//				}
+//#define CHECK_Y	if(floor(pos.y+width)>floor(oy+width)){\
+//					for(int8_t y=floor(oy+width)+1;y<=floor(pos.y+width);y++){\
+//						Block* b = GetBlock(ox,y,oz,c);\
+//						if(b==0){\
+//							vy = 0;\
+//							pos.y = oy;\
+//						} else {\
+//							BlockType t = BlockTypes[b->type];\
+//							if(t.solid){\
+//								vy = 0;\
+//								pos.y = oy;\
+//							}\
+//						}\
+//					}\
+//				} else if(floor(pos.y-width)<floor(oy-width)){\
+//					for(int8_t y=floor(oy-width)-1;y>=floor(pos.y-width);y--){\
+//						Block* b = GetBlock(ox,y,oz,c);\
+//						if(b==0){\
+//							vy = 0;\
+//							pos.y = oy;\
+//						} else {\
+//							BlockType t = BlockTypes[b->type];\
+//							if(t.solid){\
+//								vy = 0;\
+//								pos.y = oy;\
+//							}\
+//						}\
+//					}\
+//				}
+//#define CHECK_X	if(floor(pos.x+width)>floor(ox+width)){\
+//					for(int8_t x=floor(ox+width)+1;x<=floor(pos.x+width);x++){\
+//						Block* b = GetBlock(x,oy,oz,c);\
+//						if(b==0){\
+//							vx = 0;\
+//							pos.x = ox;\
+//						} else {\
+//							BlockType t = BlockTypes[b->type];\
+//							if(t.solid){\
+//								vx = 0;\
+//								pos.x = ox;\
+//							}\
+//						}\
+//					}\
+//				} else if(floor(pos.x-width)<floor(ox-width)){\
+//					for(int8_t x=floor(ox-width)-1;x>=floor(pos.x-width);x--){\
+//						Block* b = GetBlock(x,oy,oz,c);\
+//						if(b==0){\
+//							vx = 0;\
+//							pos.x = ox;\
+//						} else {\
+//							BlockType t = BlockTypes[b->type];\
+//							if(t.solid){\
+//								vx = 0;\
+//								pos.x = ox;\
+//							}\
+//						}\
+//					}\
+//				}
+//	onground = false;
+//	CHECK_X;
+//	CHECK_Y;
+//	CHECK_Z;
 	pos.Update();
 }
