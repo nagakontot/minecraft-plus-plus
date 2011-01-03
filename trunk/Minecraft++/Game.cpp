@@ -53,7 +53,7 @@ bool Game::Loop() {
 	//SkyDraw();
 	glClear(GL_DEPTH_BUFFER_BIT);
 	//Draw everything
-	uint8_t range = 10;
+	uint8_t range = 7;
 	if(ticks%30==0){//Every so often run through and clean up the chunk list
 		Chunks.clear();
 		for(uint8_t a=0;a<=range*2;a++){
@@ -72,7 +72,7 @@ bool Game::Loop() {
 	Window.Display();
 	fps = fps*0.8+0.2/Window.GetFrameTime();
 	tdelta += Window.GetFrameTime();
-	delta = Window.GetFrameTime();
+	delta = max((double)Window.GetFrameTime(),0.0001);
 	ticks++;
 	if(ticks%10==0){
 		cout << fps << endl;

@@ -32,13 +32,13 @@ void InitGraphics() {
 	AddTex(2,"textures/grass_side.png");
 	AddTex(3,"textures/grass.png");
 	AddTex(4,"textures/cobble.png");
-	AddTex(5,"textures/leaf.png");
+	/*AddTex(5,"textures/leaf.png");
 	AddTex(6,"textures/log.png");
 	AddTex(7,"textures/log_top.png");
 	AddTex(8,"textures/planks.png");
 	AddTex(9,"textures/gravel.png");
 	AddTex(10,"textures/sand.png");
-	AddTex(11,"textures/glass.png");
+	AddTex(11,"textures/glass.png");*/
 }
 
 GLuint GetTexture(string name) {

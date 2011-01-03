@@ -48,6 +48,22 @@ template <class T>
 inline int8_t sign(T x) {
 	return (x>0)-(x<0);
 }
+template <class T>
+inline T closer(T x, T y, T c){
+	if(abs(x-c)<abs(y-c)){
+		return x;
+	} else {
+		return y;
+	}
+}
+template <class T>
+inline T farther(T x, T y, T c){
+	if(abs(x-c)<abs(y-c)){
+		return y;
+	} else {
+		return x;
+	}
+}
 inline double psqdis (double x1, double y1, double x2, double y2) {
 	return sqr(x1-x2)+sqr(y1-y2);
 }
