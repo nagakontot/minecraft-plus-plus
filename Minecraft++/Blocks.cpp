@@ -10,6 +10,7 @@ Block::Block() {
 }
 
 Block* GetBlock(int8_t x, int8_t y, int8_t z, Chunk*& chunk) {
+	if(chunk==0){return 0;}
 	if(x<0){
 		chunk = chunk->xn;
 		x += 16;
@@ -126,8 +127,10 @@ void InitBlocks() {
 }
 #define BUPDATE(X,Y,Z)	c = chunk;\
 						b = GetBlock(x+X,y+Y,z+Z,c);\
-						b->extra = 0;\
-						AddChunkUpdate(c);
+						if(b!=0){\
+							b->extra = 0;\
+							AddChunkUpdate(c);\
+						}
 void AddBlockUpdate(int8_t x, int8_t y, int8_t z, Chunk* chunk) {
 	Block* b;
 	Chunk* c;

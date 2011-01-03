@@ -1,14 +1,19 @@
 #include "Global.h"
 
 noise::module::Perlin gen2d;
-noise::module::Perlin gen3d;
+noise::module::Billow gencaves;
 
 void InitGen() {
-	gen2d.SetFrequency(0.001);
+	gen2d.SetFrequency(1.0/1024);
 	gen2d.SetLacunarity(2);
 	gen2d.SetNoiseQuality(noise::QUALITY_STD);
 	gen2d.SetOctaveCount(10);
 	gen2d.SetPersistence(0.5);
+	gencaves.SetFrequency(1.0/64);
+	gencaves.SetLacunarity(2);
+	gencaves.SetNoiseQuality(noise::QUALITY_STD);
+	gencaves.SetOctaveCount(4);
+	gencaves.SetPersistence(0.5);
 }
 
 Chunk::Chunk(uint64_t _x, uint64_t _y, uint64_t _z) {
@@ -34,13 +39,14 @@ void Chunk::Generate() {
 	lock.lock();
 	//Map generation goes here =D
 	for(uint8_t a=0;a<16;a++){
-		for(uint8_t b=0;b<16;b++){
-			double cx, cy;
-			if(x/0x10000000%2==1){
+		double cx;
+		if(x/0x10000000%2==1){
 				cx = ((x&0xfffffff)<<4)+a;
 			} else {
 				cx = 0x100000000-(((x&0xfffffff)<<4)+a);
 			}
+		for(uint8_t b=0;b<16;b++){
+			double cy;
 			if(y/0x10000000%2==1){
 				cy = ((y&0xfffffff)<<4)+b;
 			} else {
@@ -57,10 +63,20 @@ void Chunk::Generate() {
 				rz = -(INT64_MAX-z);
 			}
 			for(uint8_t c=0;c<16;c++){
+				double cz;
+				if(z/0x10000000%2==1){
+					cz = ((z&0xfffffff)<<4)+c;
+				} else {
+					cz = 0x100000000-(((z&0xfffffff)<<4)+c);
+				}
 				int64_t bz = rz*16+c;
 				int64_t d = bz-r;
 				uint16_t i = a*256+b*16+c;
-				if(d>0){
+				if(gencaves.GetValue(cx,cy,cz)+1<0.01){
+					Blocks[i].type = 0;
+				} else if(d>4){
+					Blocks[i].type = 2;
+				} else if(d>0){
 					Blocks[i].type = 1;
 				} else if(d<0){
 					Blocks[i].type = 0;
@@ -127,14 +143,14 @@ void Chunk::Generate() {
 	lock.unlock();
 }
 
-#define append(x,y) for(int j=0;j<4;j++){\
+#define append(x,y,xt,yt) for(int j=0;j<4;j++){\
 						int k = 3*i;\
 						int r = 3*j;\
 						nmodel[k] = x[r]+a;\
 						nmodel[k+1] = x[r+1]+b;\
 						nmodel[k+2] = x[r+2]+c;\
-						ntex[k] = T_QUAD[j*2];\
-						ntex[k+1] = T_QUAD[j*2+1];\
+						ntex[k] = (xt+T_QUAD[j*2])/16;\
+						ntex[k+1] = (yt+T_QUAD[j*2+1])/16;\
 						ntex[k+2] = (GLfloat(t.tex[y])+0.5)/MAX_TEXTURES;\
 						i++;\
 					}
@@ -186,22 +202,22 @@ void Chunk::Update() {
 				if(bl->extra&1){
 					if(t.model==0 && t.tex!=0){
 						if(bl->extra&0x40){
-							append(M_XP,0);
+							append(M_XP,0,15-b,c);
 						}
 						if(bl->extra&0x20){
-							append(M_XN,1);
+							append(M_XN,1,b,c);
 						}
 						if(bl->extra&0x10){
-							append(M_YP,2);
+							append(M_YP,2,a,c);
 						}
 						if(bl->extra&0x8){
-							append(M_YN,3);
+							append(M_YN,3,15-a,c);
 						}
 						if(bl->extra&0x4){
-							append(M_ZP,4);
+							append(M_ZP,4,a,b);
 						}
 						if(bl->extra&0x2){
-							append(M_ZN,5);
+							append(M_ZN,5,b,a);
 						}
 					} else {
 						for(int j=0; j<t.verts; j++){
