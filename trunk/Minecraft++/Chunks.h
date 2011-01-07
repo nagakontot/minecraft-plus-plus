@@ -3,10 +3,12 @@ struct Chunk {
 	Chunk *xp, *xn, *yp, *yn, *zp, *zn;
 	Block Blocks[4096];
 	GLfloat *model, *tex;
+	GLuint vbo;
 	uint16_t verts;
 	boost::mutex lock;
 	bool generated;
 	bool updated;
+	bool vboupdated;
 	Chunk(uint64_t x, uint64_t y, uint64_t z);
 	const void Draw();
 	void Update();

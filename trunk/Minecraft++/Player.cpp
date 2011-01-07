@@ -89,32 +89,56 @@ void Player::Step() {
 	double nx = pos.x+rx;
 	double ny = pos.y+ry;
 	double nz = pos.z+rz;
-	pos.x = nx;
-	pos.y = ny;
-	pos.z = nz;
+	//pos.x = nx;
+	//pos.y = ny;
+	//pos.z = nz;
 #define HANDLE\
 	Block* b = GetBlock(x,y,z,ch);\
 	if(b==0){return;}\
 	BlockType t = BlockTypes[b->type];\
 	if(t.solid){\
-		cout << "collision!" << endl;\
-		pos.x = ox;\
-		pos.y = oy;\
-		pos.z = oz;\
+		double ax, ay, az, bx, by, bz;\
+		if(rx>0){\
+			ax = ox+width;\
+			bx = x;\
+		} else {\
+			ax = ox-width;\
+			bx = x+1;\
+		}\
+		if(ry>0){\
+			ay = oy+width;\
+			by = y;\
+		} else {\
+			ay = oy-width;\
+			by = y+1;\
+		}\
+		if(rz>0){\
+			az = oz;\
+			bz = z;\
+		} else {\
+			az = oz-height;\
+			bz = z+1;\
+		}\
+		double axy, ayz, azx, vxy, vyz, vzx;\
+		axy = pdir(ax,ay,bx,by);\
+		vxy = pdir(0,0,vx,vy);\
+		ayz = pdir(ay,az,by,bz);\
+		vyz = pdir(0,0,vy,vz);\
+		azx = pdir(az,ax,bz,bx);\
+		vzx = pdir(0,0,vz,vx);\
+		double dxy, dyz, dzx;\
+		dxy = sign(vx)*sign(vy)*angdif(axy,vxy);\
+		dyz = sign(vy)*sign(vz)*angdif(ayz,vyz);\
+		dzx = sign(vz)*sign(vx)*angdif(azx,vzx);\
+		cout << dxy << ", " << dyz << ", " << dzx << endl;\
+		if(vz>0 && dyz>0 && dzx>0){\
+			cout << "zp collision!" << endl;\
+		}\
 	}
 #define CHECK\
-	if(ox-width>x+1 || ox+width<x){\
-		if(oy-width>y+1 || oy+width<y){\
-			if(oz-height>z+1 || oz<z){\
-				if(nx-width<x+1 && nx+width>x){\
-					if(ny-width<y+1 && ny+width>y){\
-						if(nz-height<z+1 && nz>z){\
-							cout << "ohai" << endl;\
-							HANDLE;\
-						}\
-					}\
-				}\
-			}\
+	if(ox-width>x+1 || ox+width<x || oy-width>y+1 || oy+width<y || oz-height>z+1 || oz<z){\
+		if(nx-width<x+1 && nx+width>x && ny-width<y+1 && ny+width>y && nz-height<z+1 && nz>z){\
+			HANDLE;\
 		}\
 	}
 #define LOOP_Z\
@@ -123,7 +147,7 @@ void Player::Step() {
 			CHECK;\
 		}\
 	} else if(rz<0){\
-		for(int8_t z=floor(oz);z>=oz+rz;z--){\
+		for(int8_t z=floor(oz);z>=oz+rz-height-1;z--){\
 			CHECK;\
 		}\
 	} else {\
@@ -132,11 +156,11 @@ void Player::Step() {
 	}
 #define LOOP_Y\
 	if(oy>0){\
-		for(int8_t y=floor(oy);y<=oy+ry;y++){\
+		for(int8_t y=floor(oy);y<=oy+ry+width;y++){\
 			LOOP_Z;\
 		}\
 	} else if(oy<0){\
-		for(int8_t y=floor(oy);y>=oy+ry;y--){\
+		for(int8_t y=floor(oy);y>=oy+ry-width-1;y--){\
 			LOOP_Z;\
 		}\
 	} else {\
@@ -145,18 +169,18 @@ void Player::Step() {
 	}
 #define LOOP_X\
 	if(ox>0){\
-		for(int8_t x=floor(ox);x<=ox+rx;x++){\
+		for(int8_t x=floor(ox);x<=ox+rx+width;x++){\
 			LOOP_Y;\
 		}\
 	} else if(oy<0){\
-		for(int8_t x=floor(ox);x>=ox+rx;x--){\
+		for(int8_t x=floor(ox);x>=ox+rx-width-1;x--){\
 			LOOP_Y;\
 		}\
 	} else {\
 		int8_t x=floor(ox);\
 		LOOP_Y;\
 	}
-	LOOP_X;
+	//LOOP_X;
 	/*double dis = sqrt(sqr(rx)+sqr(ry)+sqr(rz));
 	double d = pdir(0,0,rx,ry);
 	double p = pdir(0,0,sqrt(sqr(rx)+sqr(ry)),rz);

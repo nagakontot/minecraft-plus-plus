@@ -2,6 +2,35 @@
 #define degtorad 0.01745329251994329576923690768489
 #define radtodeg 57.295779513082320876798154814105
 
+inline void GLCHECK(){
+	GLenum e = glGetError();
+	switch(e){
+	case GL_NO_ERROR:
+		break;
+	case GL_INVALID_ENUM:
+		cout << "GL_INVALID_ENUM" << endl;
+		break;
+	case GL_INVALID_VALUE:
+		cout << "GL_INVALID_VALUE" << endl;
+		break;
+	case GL_INVALID_OPERATION:
+		cout << "GL_INVALID_OPERATION" << endl;
+		break;
+	case GL_STACK_OVERFLOW:
+		cout << "GL_STACK_OVERFLOW" << endl;
+		break;
+	case GL_STACK_UNDERFLOW:
+		cout << "GL_STACK_UNDERFLOW" << endl;
+		break;
+	case GL_OUT_OF_MEMORY:
+		cout << "GL_OUT_OF_MEMORY" << endl;
+		break;
+	case GL_TABLE_TOO_LARGE:
+		cout << "GL_TABLE_TOO_LARGE" << endl;
+		break;
+	}
+}
+
 template <class T>
 inline std::string tostring (const T& t) {
 	std::stringstream ss;
