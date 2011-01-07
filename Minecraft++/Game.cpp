@@ -64,10 +64,12 @@ bool Game::Loop() {
 			}
 		}
 	}
+	GLCHECK();
 	glBindTexture(GL_TEXTURE_3D,TEX);
 	for(auto i=Chunks.begin(); i!=Chunks.end(); i++){
 		(*i)->Draw();
 	}
+	GLCHECK();
 	//Display the screen
 	Window.Display();
 	fps = fps*0.8+0.2/Window.GetFrameTime();

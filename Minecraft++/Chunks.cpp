@@ -28,6 +28,9 @@ Chunk::Chunk(uint64_t _x, uint64_t _y, uint64_t _z) {
 	yn = 0;
 	zp = 0;
 	zn = 0;
+	glGenBuffers(1,&vbo);
+	glBindBuffer(GL_ARRAY_BUFFER,vbo);
+	glBindBuffer(GL_ARRAY_BUFFER,0);
 	model = 0;
 	tex = 0;
 	verts = 0;
@@ -146,12 +149,12 @@ void Chunk::Generate() {
 #define append(x,y,xt,yt) for(int j=0;j<4;j++){\
 						int k = 3*i;\
 						int r = 3*j;\
-						nmodel[k] = x[r]+a;\
-						nmodel[k+1] = x[r+1]+b;\
-						nmodel[k+2] = x[r+2]+c;\
-						ntex[k] = (xt+T_QUAD[j*2])/16;\
-						ntex[k+1] = (yt+T_QUAD[j*2+1])/16;\
-						ntex[k+2] = (GLfloat(t.tex[y])+0.5)/MAX_TEXTURES;\
+						model[k] = x[r]+a;\
+						model[k+1] = x[r+1]+b;\
+						model[k+2] = x[r+2]+c;\
+						tex[k] = (xt+T_QUAD[j*2])/16;\
+						tex[k+1] = (yt+T_QUAD[j*2+1])/16;\
+						tex[k+2] = (GLfloat(t.tex[y])+0.5)/MAX_TEXTURES;\
 						i++;\
 					}
 
@@ -191,8 +194,10 @@ void Chunk::Update() {
 			}
 		}
 	}
-	GLfloat *nmodel = new GLfloat[verts*3];
-	GLfloat *ntex = new GLfloat[verts*3];
+	delete[] model;
+	delete[] tex;
+	model = new GLfloat[verts*3];
+	tex = new GLfloat[verts*3];
 	int i = 0;
 	for(int a=0;a<16;a++){
 		for(int b=0;b<16;b++){
@@ -214,21 +219,21 @@ void Chunk::Update() {
 							append(M_YN,3,15-a,c);
 						}
 						if(bl->extra&0x4){
-							append(M_ZP,4,a,b);
+							append(M_ZP,4,b,a);
 						}
 						if(bl->extra&0x2){
-							append(M_ZN,5,b,a);
+							append(M_ZN,5,15-b,a);
 						}
 					} else {
 						for(int j=0; j<t.verts; j++){
 							int l = 3*i;
 							int r = 3*j;
-							nmodel[l] = t.model[r]+a;
-							ntex[l] = t.tex[r];
-							nmodel[l+1] = t.model[r+1]+b;
-							ntex[l+1] = t.tex[r+1];
-							nmodel[l+2] = t.model[r+2]+c;
-							ntex[l+2] = t.tex[r+2];
+							model[l] = t.model[r]+a;
+							tex[l] = t.tex[r];
+							model[l+1] = t.model[r+1]+b;
+							tex[l+1] = t.tex[r+1];
+							model[l+2] = t.model[r+2]+c;
+							tex[l+2] = t.tex[r+2];
 							i++;
 						}
 					}
@@ -236,11 +241,8 @@ void Chunk::Update() {
 			}
 		}
 	}
-	delete[] model;
-	delete[] tex;
-	model = nmodel;
-	tex = ntex;
 	updated = true;
+	vboupdated = false;
 	lock.unlock();
 }
 
@@ -279,10 +281,21 @@ const void Chunk::Draw() {
 				dz = -dz;
 			}
 			glTranslated(-16*dx, -16*dy, -16*dz);
-			glTexCoordPointer(3,GL_FLOAT,0,tex);
-			glVertexPointer(3,GL_FLOAT,0,model);
+			glEnableClientState(GL_VERTEX_ARRAY);
+			glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+			glBindBuffer(GL_ARRAY_BUFFER,vbo);
+			if(!vboupdated){
+				glBufferData(GL_ARRAY_BUFFER,verts*6*sizeof(GLfloat),NULL,GL_DYNAMIC_DRAW);
+				glBufferSubData(GL_ARRAY_BUFFER,0,verts*3*sizeof(GLfloat),model);
+				glBufferSubData(GL_ARRAY_BUFFER,verts*3*sizeof(GLfloat),verts*3*sizeof(GLfloat),tex);
+				vboupdated = true;
+			}
+			glVertexPointer(3,GL_FLOAT,0,0);
+			glTexCoordPointer(3,GL_FLOAT,0,(char*)NULL+verts*3*sizeof(GLfloat));
 			glDrawArrays(GL_QUADS,0,verts);
-			glFlush();
+			glBindBuffer(GL_ARRAY_BUFFER,0);
+			glDisableClientState(GL_VERTEX_ARRAY);
+			glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 			lock.unlock();
 		}
 	}
