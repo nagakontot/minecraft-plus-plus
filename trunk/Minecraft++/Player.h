@@ -9,6 +9,7 @@ public:
 	double accel;
 	double gravity;
 	double speed;
+	double jump;
 	bool respawned;
 	bool onground;
 	Player();

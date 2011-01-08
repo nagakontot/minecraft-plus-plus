@@ -75,7 +75,7 @@ void Chunk::Generate() {
 				int64_t bz = rz*16+c;
 				int64_t d = bz-r;
 				uint16_t i = a*256+b*16+c;
-				if(gencaves.GetValue(cx,cy,cz)+1<0.01){
+				if(gencaves.GetValue(cx,cy,cz)+1<0.05){
 					Blocks[i].type = 0;
 				} else if(d>4){
 					Blocks[i].type = 2;
@@ -219,10 +219,10 @@ void Chunk::Update() {
 							append(M_YN,3,15-a,c);
 						}
 						if(bl->extra&0x4){
-							append(M_ZP,4,b,a);
+							append(M_ZP,4,15-a,b);
 						}
 						if(bl->extra&0x2){
-							append(M_ZN,5,15-b,a);
+							append(M_ZN,5,15-a,15-b);
 						}
 					} else {
 						for(int j=0; j<t.verts; j++){
@@ -281,8 +281,6 @@ const void Chunk::Draw() {
 				dz = -dz;
 			}
 			glTranslated(-16*dx, -16*dy, -16*dz);
-			glEnableClientState(GL_VERTEX_ARRAY);
-			glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 			glBindBuffer(GL_ARRAY_BUFFER,vbo);
 			if(!vboupdated){
 				glBufferData(GL_ARRAY_BUFFER,verts*6*sizeof(GLfloat),NULL,GL_DYNAMIC_DRAW);
@@ -293,9 +291,6 @@ const void Chunk::Draw() {
 			glVertexPointer(3,GL_FLOAT,0,0);
 			glTexCoordPointer(3,GL_FLOAT,0,(char*)NULL+verts*3*sizeof(GLfloat));
 			glDrawArrays(GL_QUADS,0,verts);
-			glBindBuffer(GL_ARRAY_BUFFER,0);
-			glDisableClientState(GL_VERTEX_ARRAY);
-			glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 			lock.unlock();
 		}
 	}
