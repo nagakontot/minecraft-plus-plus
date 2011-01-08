@@ -64,12 +64,15 @@ bool Game::Loop() {
 			}
 		}
 	}
-	GLCHECK();
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 	glBindTexture(GL_TEXTURE_3D,TEX);
 	for(auto i=Chunks.begin(); i!=Chunks.end(); i++){
 		(*i)->Draw();
 	}
-	GLCHECK();
+	glBindBuffer(GL_ARRAY_BUFFER,0);
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	//Display the screen
 	Window.Display();
 	fps = fps*0.8+0.2/Window.GetFrameTime();
@@ -77,8 +80,9 @@ bool Game::Loop() {
 	delta = max((double)Window.GetFrameTime(),0.0001);
 	ticks++;
 	if(ticks%10==0){
-		cout << fps << endl;
+		//cout << fps << endl;
 	}
+	GLCHECK();
 	return Window.IsOpened();
 }
 void Game::Unload() {
