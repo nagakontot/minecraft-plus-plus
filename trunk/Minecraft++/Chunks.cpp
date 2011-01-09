@@ -196,6 +196,14 @@ void Chunk::Update() {
 	}
 	delete[] model;
 	delete[] tex;
+	if(verts==0){
+		model = 0;
+		tex = 0;
+		updated = true;
+		vboupdated = false;
+		lock.unlock();
+		return;
+	}
 	model = new GLfloat[verts*3];
 	tex = new GLfloat[verts*3];
 	int i = 0;
@@ -287,6 +295,15 @@ const void Chunk::Draw() {
 				glBufferSubData(GL_ARRAY_BUFFER,0,verts*3*sizeof(GLfloat),model);
 				glBufferSubData(GL_ARRAY_BUFFER,verts*3*sizeof(GLfloat),verts*3*sizeof(GLfloat),tex);
 				vboupdated = true;
+			} else {
+				if(tex!=0){
+					delete[] tex;
+					tex = 0;
+				}
+				if(model!=0){
+					delete[] model;
+					model = 0;
+				}
 			}
 			glVertexPointer(3,GL_FLOAT,0,0);
 			glTexCoordPointer(3,GL_FLOAT,0,(char*)NULL+verts*3*sizeof(GLfloat));
