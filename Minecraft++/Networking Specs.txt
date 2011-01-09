@@ -1,0 +1,30 @@
+Packets:
+All packets begin with 2 unsigned bytes indicating the packet type
+
+Packet Types:
+0x0000 - Ping
+0x0001 - Chunk Request
+0x0002 - Chunk Data
+
+Ping
+2 ubyte type (0x0000)
+Contains just the packet type.
+Sent out once a second to each client by the server
+Sent out once a second by each client to the server
+If a ping packet has not been received for longer than the timeout, the client/server assumes that the connection has disconnected.
+
+Chunk Request
+2 ubyte type (0x0001)
+8 ubyte x coordinate
+8 ubyte y coordinate
+8 ubyte z coordinate
+Sent by the client to the server when they want a chunk
+
+Chunk Data
+2 ubyte type (0x0002)
+8 ubyte x coordinate
+8 ubyte y coordinate
+8 ubyte z coordinate
+32,768 bytes of raw contiguous block data
+Sent by the server to the client in response to a Chunk Request packet
+Also sent by the client to the server so the chunk can be saved
