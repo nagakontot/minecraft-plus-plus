@@ -12,6 +12,7 @@ public:
 	double jump;
 	bool respawned;
 	bool onground;
+	bool safespot;
 	Player();
 	void Step();
 } extern player;

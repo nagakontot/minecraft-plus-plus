@@ -18,9 +18,10 @@ Player::Player() {
 	speed = 8;
 	jump = 5.5;
 	respawned = false;
+	safespot = false;
 	pos.cx = (uint64_t(random(rand()))<<32)+random(rand());
 	pos.cy = (uint64_t(random(rand()))<<32)+random(rand());
-	pos.cz = UINT64_HALF-2;
+	pos.cz = UINT64_HALF-1;
 	Window.SetCursorPosition(Window.GetWidth()/2,Window.GetHeight()/2);
 }
 
@@ -33,16 +34,39 @@ void Player::Step() {
 		if(!respawned){
 			pos.cx = (uint64_t(random(rand()))<<32)+random(rand());
 			pos.cy = (uint64_t(random(rand()))<<32)+random(rand());
+			pos.cz = UINT64_HALF;
 		}
 		respawned = true;
+		safespot = false;
 	} else {
 		respawned = false;
 	}
+	//Mouse stuff
 	int mx = input.GetMouseX()-Window.GetWidth()/2;
 	int my = input.GetMouseY()-Window.GetHeight()/2;
 	Window.SetCursorPosition(Window.GetWidth()/2,Window.GetHeight()/2);
 	rot.d += 0.2*mx;
 	rot.p = min((double)89,max((double)-89,rot.p+0.2*my));
+	//Moving the player up until he is no longer inside a solid block
+	if(!safespot){
+		Chunk* cs = GetChunk(pos.cx,pos.cy,pos.cz);
+		if(cs==0 || !cs->generated){
+			return;
+		}
+		Block* bh1 = GetBlock(pos.x,pos.y,pos.z,cs);
+		Block* bh2 = GetBlock(pos.x,pos.y,pos.z-1,cs);
+		if(bh1==0 || bh2==0){
+			return;
+		}
+		BlockType t1 = BlockTypes[bh1->type];
+		BlockType t2 = BlockTypes[bh2->type];
+		if(t1.solid || t2.solid){
+			pos.z -= 1;
+			pos.Update();
+			return;
+		}
+		safespot = true;
+	}
 	bool kw = input.IsKeyDown(sf::Key::W);
 	bool ka = input.IsKeyDown(sf::Key::A);
 	bool ks = input.IsKeyDown(sf::Key::S);
