@@ -1,17 +1,31 @@
 #include "Global.h"
 
-noise::module::Perlin gen2d;
+noise::module::Perlin genhills;
+noise::module::RidgedMulti genmtns;
+noise::module::Perlin gentype;
 noise::module::Billow gencaves;
 
 void InitGen() {
-	gen2d.SetFrequency(1.0/1024);
-	gen2d.SetLacunarity(2);
-	gen2d.SetNoiseQuality(noise::QUALITY_STD);
-	gen2d.SetOctaveCount(8);
-	gen2d.SetPersistence(0.5);
+	genhills.SetFrequency(1.0/1024);
+	genhills.SetLacunarity(2);
+	genhills.SetNoiseQuality(noise::QUALITY_FAST);
+	genhills.SetOctaveCount(8);
+	genhills.SetPersistence(0.5);
+
+	genmtns.SetFrequency(1.0/2048);
+	genmtns.SetLacunarity(1.5);
+	genmtns.SetNoiseQuality(noise::QUALITY_FAST);
+	genmtns.SetOctaveCount(16);
+
+	gentype.SetFrequency(1.0/4096);
+	gentype.SetLacunarity(2);
+	gentype.SetNoiseQuality(noise::QUALITY_FAST);
+	gentype.SetOctaveCount(8);
+	gentype.SetPersistence(0.5);
+
 	gencaves.SetFrequency(1.0/100);
 	gencaves.SetLacunarity(2);
-	gencaves.SetNoiseQuality(noise::QUALITY_STD);
+	gencaves.SetNoiseQuality(noise::QUALITY_FAST);
 	gencaves.SetOctaveCount(4);
 	gencaves.SetPersistence(0.5);
 }
@@ -55,10 +69,10 @@ void Chunk::Generate() {
 			} else {
 				cy = 0x100000000-(((y&0xfffffff)<<4)+b);
 			}
-			double hd = gen2d.GetValue(cx,cy,0);
-			double o = gen2d.GetValue(x>>16,y>>16,1000);
-			hd += o;
-			int64_t r = hd*0x80;
+			double hh = genhills.GetValue(cx,cy,0);
+			double hm = genmtns.GetValue(cx,cy,0);
+			double sel = gentype.GetValue(cx,cy,0);
+			int64_t r = max(0.0,sel)*hm*0x200+(1-abs(sel))*hh*0x80;
 			int64_t rz;
 			if(z>=INT64_MAX){
 				rz = z-INT64_MAX;
@@ -75,14 +89,12 @@ void Chunk::Generate() {
 				int64_t bz = rz*16+c;
 				int64_t d = bz-r;
 				uint16_t i = a*256+b*16+c;
-				if(gencaves.GetValue(cx,cy,cz)+1<0){
+				if(d<0 || gencaves.GetValue(cx,cy,cz)+1<0){
 					Blocks[i].type = 0;
 				} else if(d>4){
 					Blocks[i].type = 2;
 				} else if(d>0){
 					Blocks[i].type = 1;
-				} else if(d<0){
-					Blocks[i].type = 0;
 				} else {
 					Blocks[i].type = 3;
 				}
