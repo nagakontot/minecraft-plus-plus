@@ -44,18 +44,6 @@ Block* GetBlock(int8_t x, int8_t y, int8_t z, Chunk*& chunk) {
 	return &(chunk->Blocks[x*256+y*16+z]);
 }
 
-const void Block::Draw(int8_t x, int8_t y, int8_t z) {
-	if(!extra&1){return;}
-	const BlockType& t = BlockTypes[type];
-	if(t.verts==0){return;}
-	glPushMatrix();
-	glTranslated(x,y,z);
-	glTexCoordPointer(3,GL_FLOAT,0,t.tex);
-	glVertexPointer(3,GL_FLOAT,0,t.model);
-	glDrawArrays(GL_QUADS,0,t.verts);
-	glPopMatrix();
-}
-
 bool BlockVisible(int8_t x, int8_t y, int8_t z, Chunk* chunk) {
 	Block* b = GetBlock(x, y, z, chunk);
 	if(b==0){return false;}

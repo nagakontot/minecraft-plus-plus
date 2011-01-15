@@ -6,7 +6,6 @@ struct Block{
 	uint8_t light;
 	uint8_t extra;
 	Block();
-	const void Draw(int8_t x, int8_t y, int8_t z);
 	void Update(int8_t x, int8_t y, int8_t z, struct Chunk* chunk);
 };
 

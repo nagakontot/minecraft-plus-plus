@@ -11,7 +11,7 @@ void InitGraphics() {
 	glDepthFunc(GL_LEQUAL);
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_TEXTURE_3D);
-	glEnable(GL_BLEND);
+	//glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_ALPHA_TEST);
 	glAlphaFunc(GL_GREATER,0);
@@ -19,6 +19,13 @@ void InitGraphics() {
 	glCullFace(GL_BACK);
 	//glEnableClientState(GL_VERTEX_ARRAY);
 	//glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	//glFogi(GL_FOG_MODE,GL_LINEAR);
+	//glFogi(GL_FOG_START,0);
+	//glFogi(GL_FOG_END,7);
+	//glFogi(GL_FOG_COORD_SRC,GL_FRAGMENT_DEPTH);
+	//GLfloat color[4] = {1,1,1,1};
+	//glFogfv(GL_FOG_COLOR,color);
+	//glEnable(GL_FOG);
 	glGenTextures(1,&TEX);
 	glBindTexture(GL_TEXTURE_3D,TEX);
 	glTexParameteri(GL_TEXTURE_3D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);

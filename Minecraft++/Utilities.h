@@ -32,53 +32,53 @@ inline void GLCHECK(){
 }
 
 template <class T>
-inline std::string tostring (const T& t) {
+const inline std::string tostring (const T& t) {
 	std::stringstream ss;
 	ss << t;
 	return ss.str();
 }
-inline std::string tostring(const int& t) {
+const inline std::string tostring(const int& t) {
 	char buffer[15];
 	sprintf(buffer,"%i",t);
 	return (string)buffer;
 }
-inline std::string tostring(const double& t) {
+const inline std::string tostring(const double& t) {
 	char buffer[15];
 	sprintf(buffer,"%f",t);
 	return (string)buffer;
 }
 template <class T>
-inline double toreal (const T& t) {
+const inline double toreal (const T& t) {
 	std::stringstream ss;
 	ss << t;
 	double d;
 	ss >> d;
 	return d;
 }
-inline double sqr (double x) {
+const inline double sqr (double x) {
 	return x*x;
 }
-inline double ldx (double len, double dir) {
+const inline double ldx (double len, double dir) {
 	return cos(dir*degtorad)*len;
 }
-inline double ldy (double len, double dir) {
+const inline double ldy (double len, double dir) {
 	return sin(dir*degtorad)*len;
 }
-inline double pdis (double x1, double y1, double x2, double y2) {
+const inline double pdis (double x1, double y1, double x2, double y2) {
 	return sqrt(sqr(x1-x2)+sqr(y1-y2));
 }
-inline double pdir (double x1, double y1, double x2, double y2) {
+const inline double pdir (double x1, double y1, double x2, double y2) {
 	return radtodeg*atan2(y2-y1,x2-x1);
 }
-inline double angdif (double angle1, double angle2) {
+const inline double angdif (double angle1, double angle2) {
 	return fmod(fmod(angle1-angle2,360)+540,360)-180;
 }
 template <class T>
-inline int8_t sign(T x) {
+const inline int8_t sign(T x) {
 	return (x>0)-(x<0);
 }
 template <class T>
-inline T closer(T x, T y, T c){
+const inline T closer(T x, T y, T c){
 	if(abs(x-c)<abs(y-c)){
 		return x;
 	} else {
@@ -86,20 +86,20 @@ inline T closer(T x, T y, T c){
 	}
 }
 template <class T>
-inline T farther(T x, T y, T c){
+const inline T farther(T x, T y, T c){
 	if(abs(x-c)<abs(y-c)){
 		return y;
 	} else {
 		return x;
 	}
 }
-inline double psqdis (double x1, double y1, double x2, double y2) {
+const inline double psqdis (double x1, double y1, double x2, double y2) {
 	return sqr(x1-x2)+sqr(y1-y2);
 }
 inline double random(double x) {
 	return double(rand())/RAND_MAX*x;
 }
-inline uint32_t rhash(uint8_t* x, uint32_t len) {
+const inline uint32_t rhash(uint8_t* x, uint32_t len) {
 	uint32_t hash, i;
 	for(hash = i = 0; i < len; ++i){
 		hash += x[i];
@@ -112,7 +112,7 @@ inline uint32_t rhash(uint8_t* x, uint32_t len) {
 	return hash;
 }
 template <class T1>
-inline uint32_t random(T1 s1) {
+const inline uint32_t random(T1 s1) {
 	uint8_t x[sizeof(T1)];
 	uint32_t s = 0;
 	*(T1*)(x+s) = s1;
@@ -120,7 +120,7 @@ inline uint32_t random(T1 s1) {
 	return max(uint32_t(1),rhash(x, s));
 }
 template <class T1, class T2>
-inline uint32_t random(T1 s1, T2 s2) {
+const inline uint32_t random(T1 s1, T2 s2) {
 	uint8_t x[sizeof(T1)+sizeof(T2)];
 	uint32_t s = 0;
 	*(T1*)(x+s) = s1;
@@ -130,7 +130,7 @@ inline uint32_t random(T1 s1, T2 s2) {
 	return rhash(x, s);
 }
 template <class T1, class T2, class T3>
-inline uint32_t random(T1 s1, T2 s2, T3 s3) {
+const inline uint32_t random(T1 s1, T2 s2, T3 s3) {
 	uint8_t x[sizeof(T1)+sizeof(T2)+sizeof(T3)];
 	uint32_t s = 0;
 	*(T1*)(x+s) = s1;
@@ -142,7 +142,7 @@ inline uint32_t random(T1 s1, T2 s2, T3 s3) {
 	return rhash(x, s);
 }
 template <class T1, class T2, class T3, class T4>
-inline uint32_t random(T1 s1, T2 s2, T3 s3, T4 s4) {
+const inline uint32_t random(T1 s1, T2 s2, T3 s3, T4 s4) {
 	uint8_t x[sizeof(T1)+sizeof(T2)+sizeof(T3)+sizeof(T4)];
 	uint32_t s = 0;
 	*(T1*)(x+s) = s1;
@@ -156,7 +156,7 @@ inline uint32_t random(T1 s1, T2 s2, T3 s3, T4 s4) {
 	return rhash(x, s);
 }
 template <class T1, class T2, class T3, class T4, class T5>
-inline uint32_t random(T1 s1, T2 s2, T3 s3, T4 s4, T5 s5) {
+const inline uint32_t random(T1 s1, T2 s2, T3 s3, T4 s4, T5 s5) {
 	uint8_t x[sizeof(T1)+sizeof(T2)+sizeof(T3)+sizeof(T4)+sizeof(T5)];
 	uint32_t s = 0;
 	*(T1*)(x+s) = s1;
@@ -172,7 +172,7 @@ inline uint32_t random(T1 s1, T2 s2, T3 s3, T4 s4, T5 s5) {
 	return rhash(x, s);
 }
 template <class T1, class T2, class T3, class T4, class T5, class T6>
-inline uint32_t random(T1 s1, T2 s2, T3 s3, T4 s4, T5 s5, T6 s6) {
+const inline uint32_t random(T1 s1, T2 s2, T3 s3, T4 s4, T5 s5, T6 s6) {
 	uint8_t x[sizeof(T1)+sizeof(T2)+sizeof(T3)+sizeof(T4)+sizeof(T5)+sizeof(T6)];
 	uint32_t s = 0;
 	*(T1*)(x+s) = s1;

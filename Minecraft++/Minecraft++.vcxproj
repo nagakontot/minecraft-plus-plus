@@ -324,6 +324,9 @@
     <ClInclude Include="Rotation.h" />
     <ClInclude Include="Utilities.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Networking Specs.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
