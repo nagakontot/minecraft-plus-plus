@@ -7,9 +7,9 @@ void InitGen() {
 	gen2d.SetFrequency(1.0/1024);
 	gen2d.SetLacunarity(2);
 	gen2d.SetNoiseQuality(noise::QUALITY_STD);
-	gen2d.SetOctaveCount(10);
+	gen2d.SetOctaveCount(8);
 	gen2d.SetPersistence(0.5);
-	gencaves.SetFrequency(1.0/64);
+	gencaves.SetFrequency(1.0/100);
 	gencaves.SetLacunarity(2);
 	gencaves.SetNoiseQuality(noise::QUALITY_STD);
 	gencaves.SetOctaveCount(4);
@@ -75,7 +75,7 @@ void Chunk::Generate() {
 				int64_t bz = rz*16+c;
 				int64_t d = bz-r;
 				uint16_t i = a*256+b*16+c;
-				if(gencaves.GetValue(cx,cy,cz)+1<0.05){
+				if(gencaves.GetValue(cx,cy,cz)+1<0){
 					Blocks[i].type = 0;
 				} else if(d>4){
 					Blocks[i].type = 2;

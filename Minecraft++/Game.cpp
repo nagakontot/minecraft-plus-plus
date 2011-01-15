@@ -80,7 +80,7 @@ bool Game::Loop() {
 	delta = max((double)Window.GetFrameTime(),0.0001);
 	ticks++;
 	if(ticks%10==0){
-		//cout << fps << endl;
+		cout << fps << endl;
 	}
 	GLCHECK();
 	return Window.IsOpened();
