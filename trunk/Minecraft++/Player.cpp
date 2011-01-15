@@ -187,6 +187,7 @@ void Player::Step() {
 	double dyz = pdir(0,0,ry,rz);
 	double dzx = pdir(0,0,rz,rx);
 	while(dis>0){
+		bool finished = false;
 		rx = vx*delta;
 		ry = vy*delta;
 		rz = vz*delta;
@@ -203,10 +204,10 @@ void Player::Step() {
 		}
 		if(ry>0){
 			ny = floor(pos.y+width)+1;
-			dy = abs((ny-pos.y-width)/ry*tdis);
+			dy = abs((ny-(pos.y+width))/ry*tdis);
 		} else if(ry<0){
 			ny = floor(pos.y-width)-1;
-			dy = abs((ny-pos.y+width)/ry*tdis);
+			dy = abs((ny-(pos.y-width))/ry*tdis);
 		} else {
 			dy = 0;
 		}
@@ -243,10 +244,13 @@ void Player::Step() {
 			choice c = choices.top();
 			choices.pop();
 			if(c.value>dis){
-				ndis = dis+1;
+				finished = true;
 				break;
 			}
 			if(c.value==0){
+				if(choices.empty()){
+					finished = true;
+				}
 				continue;
 			}
 			int8_t sx, sy, sz;
@@ -266,13 +270,13 @@ void Player::Step() {
 						}
 						BlockType t = BlockTypes[b->type];
 						if(t.solid){
-							cout << "x collision!" << endl;
+							cout << "x" << endl;
 							vx = 0;
 							if(rx>0){
-								pos.x = nx-0.001;
+								pos.x = nx-0.0001-width;
 							}
 							if(rx<0){
-								pos.x = nx+0.001;
+								pos.x = nx+0.0001+width;
 							}
 							pos.y += ry/tdis*c.value;
 							pos.z += rz/tdis*c.value;
@@ -291,13 +295,13 @@ void Player::Step() {
 						}
 						BlockType t = BlockTypes[b->type];
 						if(t.solid){
-							cout << "y collision!" << endl;
+							cout << "y" << endl;
 							vy = 0;
 							if(ry>0){
-								pos.y = ny-0.001;
+								pos.y = ny-0.0001-width;
 							}
-							if(rx<0){
-								pos.y = ny+0.001;
+							if(ry<0){
+								pos.y = ny+0.0001+width;
 							}
 							pos.x += rx/tdis*c.value;
 							pos.z += rz/tdis*c.value;
@@ -316,13 +320,13 @@ void Player::Step() {
 						}
 						BlockType t = BlockTypes[b->type];
 						if(t.solid){
-							cout << "z collision!" << endl;
 							vz = 0;
+							rz = 0;
 							if(rz>0){
-								pos.z = nz-0.1;
+								pos.z = nz-0.0001;
 							}
 							if(rz<0){
-								pos.z = nz+0.1;
+								pos.z = nz+0.0001;
 							}
 							pos.x += rx/tdis*c.value;
 							pos.y += ry/tdis*c.value;
@@ -332,15 +336,17 @@ void Player::Step() {
 					}
 				}
 			}
-			done:;
 		}
-		if(ndis>dis){
-			pos.x += rx/tdis*dis;
-			pos.y += ry/tdis*dis;
-			pos.z += rz/tdis*dis;
+		finished = true;
+		done:;
+		if(finished){
+			pos.x += rx/tdis*ndis;
+			pos.y += ry/tdis*ndis;
+			pos.z += rz/tdis*ndis;
 			break;
 		}
 		dis = ndis;
+		continue;
 	}
 	pos.Update();
 }

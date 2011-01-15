@@ -268,48 +268,81 @@ void Chunk::AddUpdate(uint8_t x1, uint8_t y1, uint8_t z1, uint8_t x2, uint8_t y2
 const void Chunk::Draw() {
 	if(generated && updated && verts>0){
 		if(lock.try_lock()){
-			glLoadIdentity();
-			int64_t dx, dy, dz;
-			if(player.pos.cx>x){
-				dx = player.pos.cx-x;
+			//View culling. Thereby speeding up the rendering.
+			//This needs a lot of work.
+			/*double vfov = 60*degtorad;
+			double wfov = atan(tan(vfov)*Window.GetWidth()/Window.GetHeight());
+			double diag = sqrt(sqr(tan(vfov))+sqr(tan(wfov)));
+			double dfov = atan(diag);
+			double px, py, pz;
+			if(x>player.pos.cx){
+				px = x-player.pos.cx;
 			} else {
-				dx = x-player.pos.cx;
-				dx = -dx;
+				px = player.pos.cx-x;
+				px = -px;
 			}
-			if(player.pos.cy>y){
-				dy = player.pos.cy-y;
+			px -= player.pos.x/16-0.5;
+			if(y>player.pos.cy){
+				py = y-player.pos.cy;
 			} else {
-				dy = y-player.pos.cy;
-				dy = -dy;
+				py = player.pos.cy-y;
+				py = -py;
 			}
-			if(player.pos.cz>z){
-				dz = player.pos.cz-z;
+			py -= player.pos.y/16-0.5;
+			if(z>player.pos.cz){
+				pz = z-player.pos.cz;
 			} else {
-				dz = z-player.pos.cz;
-				dz = -dz;
+				pz = player.pos.cz-z;
+				pz = -pz;
 			}
-			glTranslated(-16*dx, -16*dy, -16*dz);
-			glBindBuffer(GL_ARRAY_BUFFER,vbo);
-			if(!vboupdated){
-				glBufferData(GL_ARRAY_BUFFER,verts*6*sizeof(GLfloat),NULL,GL_DYNAMIC_DRAW);
-				glBufferSubData(GL_ARRAY_BUFFER,0,verts*3*sizeof(GLfloat),model);
-				glBufferSubData(GL_ARRAY_BUFFER,verts*3*sizeof(GLfloat),verts*3*sizeof(GLfloat),tex);
-				vboupdated = true;
-			} else {
-				if(tex!=0){
-					delete[] tex;
-					tex = 0;
+			pz -= player.pos.z/16-0.5;
+			double dis = sqrt(sqr(px)+sqr(py)+sqr(pz));
+			double ad = 2*acos(sqrt(3.0)/2/dis);
+			double da = acos((ldx(1,player.rot.d)*ldx(1,player.rot.p)*px+ldy(1,player.rot.d)*ldx(1,player.rot.p)*py+ldy(1,player.rot.p)*pz)/dis);
+			if(dis<2 || da<dfov+ad){*/
+				glLoadIdentity();
+				double dx, dy, dz;
+				if(player.pos.cx>x){
+					dx = player.pos.cx-x;
+				} else {
+					dx = x-player.pos.cx;
+					dx = -dx;
 				}
-				if(model!=0){
-					delete[] model;
-					model = 0;
+				if(player.pos.cy>y){
+					dy = player.pos.cy-y;
+				} else {
+					dy = y-player.pos.cy;
+					dy = -dy;
 				}
+				if(player.pos.cz>z){
+					dz = player.pos.cz-z;
+				} else {
+					dz = z-player.pos.cz;
+					dz = -dz;
+				}
+				glTranslated(-16*dx, -16*dy, -16*dz);
+				glBindBuffer(GL_ARRAY_BUFFER,vbo);
+				if(!vboupdated){
+					glBufferData(GL_ARRAY_BUFFER,verts*6*sizeof(GLfloat),NULL,GL_DYNAMIC_DRAW);
+					glBufferSubData(GL_ARRAY_BUFFER,0,verts*3*sizeof(GLfloat),model);
+					glBufferSubData(GL_ARRAY_BUFFER,verts*3*sizeof(GLfloat),verts*3*sizeof(GLfloat),tex);
+					vboupdated = true;
+				} else {
+					if(tex!=0){
+						delete[] tex;
+						tex = 0;
+					}
+					if(model!=0){
+						delete[] model;
+						model = 0;
+					}
+				}
+				glVertexPointer(3,GL_FLOAT,0,0);
+				glTexCoordPointer(3,GL_FLOAT,0,(char*)NULL+verts*3*sizeof(GLfloat));
+				glDrawArrays(GL_QUADS,0,verts);
 			}
-			glVertexPointer(3,GL_FLOAT,0,0);
-			glTexCoordPointer(3,GL_FLOAT,0,(char*)NULL+verts*3*sizeof(GLfloat));
-			glDrawArrays(GL_QUADS,0,verts);
 			lock.unlock();
-		}
+		//}
 	}
 }
 
