@@ -11,7 +11,7 @@ uint64_t ticks = 0;
 bool Game::Init() {
 	InitBlocks();
 	InitGen();
-	Window.Create(sf::VideoMode(800,600,32),"Minecraft++",sf::Style::Close|sf::Style::Titlebar,sf::ContextSettings(24,0,0,3,3));
+	Window.Create(sf::VideoMode(800,600,32),"Infinity Cubed",sf::Style::Close|sf::Style::Titlebar,sf::ContextSettings(24,0,0,3,3));
 	Window.ShowMouseCursor(false);
 	//Window.SetFramerateLimit(30);
 	InitGraphics();
