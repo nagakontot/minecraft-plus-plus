@@ -16,19 +16,13 @@ Player::Player() {
 	accel = 0.004;
 	gravity = 9.8;
 	speed = 8;
-	jump = 6;
+	jump = 5.5;
 	respawned = false;
 	pos.cx = (uint64_t(random(rand()))<<32)+random(rand());
 	pos.cy = (uint64_t(random(rand()))<<32)+random(rand());
 	pos.cz = UINT64_HALF;
 	Window.SetCursorPosition(Window.GetWidth()/2,Window.GetHeight()/2);
 }
-
-#define handle(w)	if(d##w!=0 && d##w<dis){\
-						v##w = 0;\
-						pos.##w = o##w;\
-						ndis = dis-d##w;\
-					}
 
 void Player::Step() {
 	if(!Game::Active){
@@ -74,7 +68,7 @@ void Player::Step() {
 		vx *= d;
 		vy *= d;
 	}
-	if(input.IsKeyDown(sf::Key::Space)){
+	if(input.IsKeyDown(sf::Key::Space) && onground){
 		vz = -jump;
 	}
 	Chunk* ch = GetChunk(pos.cx,pos.cy,pos.cz);
@@ -89,98 +83,6 @@ void Player::Step() {
 	double ry = vy*delta;
 	double rz = vz*delta;
 	onground = false;
-/*#define HANDLE\
-	Block* b = GetBlock(x,y,z,ch);\
-	if(b==0){return;}\
-	BlockType t = BlockTypes[b->type];\
-	if(t.solid){\
-		double ax, ay, az, bx, by, bz;\
-		if(rx>0){\
-			ax = ox+width;\
-			bx = x;\
-		} else {\
-			ax = ox-width;\
-			bx = x+1;\
-		}\
-		if(ry>0){\
-			ay = oy+width;\
-			by = y;\
-		} else {\
-			ay = oy-width;\
-			by = y+1;\
-		}\
-		if(rz>0){\
-			az = oz;\
-			bz = z;\
-		} else {\
-			az = oz-height;\
-			bz = z+1;\
-		}\
-		double axy, ayz, azx, vxy, vyz, vzx;\
-		axy = pdir(ax,ay,bx,by);\
-		vxy = pdir(0,0,vx,vy);\
-		ayz = pdir(ay,az,by,bz);\
-		vyz = pdir(0,0,vy,vz);\
-		azx = pdir(az,ax,bz,bx);\
-		vzx = pdir(0,0,vz,vx);\
-		double dxy, dyz, dzx;\
-		dxy = sign(vx)*sign(vy)*angdif(axy,vxy);\
-		dyz = sign(vy)*sign(vz)*angdif(ayz,vyz);\
-		dzx = sign(vz)*sign(vx)*angdif(azx,vzx);\
-		if(vz>0 && dyz>0 && dzx<0){\
-			pos.z = z-0.001;\
-			vz = 0;\
-			onground = true;\
-		} else {\
-			cout << dxy << ", " << dyz << ", " << dzx << endl;\
-		}\
-	}
-#define CHECK\
-	if(ox-width>x+1 || ox+width<x || oy-width>y+1 || oy+width<y || oz-height>z+1 || oz<z){\
-		if(nx-width<x+1 && nx+width>x && ny-width<y+1 && ny+width>y && nz-height<z+1 && nz>z){\
-			HANDLE;\
-		}\
-	}
-#define LOOP_Z\
-	if(rz>0){\
-		for(int8_t z=floor(oz);z<=oz+rz;z++){\
-			CHECK;\
-		}\
-	} else if(rz<0){\
-		for(int8_t z=floor(oz);z>=oz+rz-height-1;z--){\
-			CHECK;\
-		}\
-	} else {\
-		int8_t z=floor(oz);\
-		CHECK;\
-	}
-#define LOOP_Y\
-	if(oy>0){\
-		for(int8_t y=floor(oy);y<=oy+ry+width;y++){\
-			LOOP_Z;\
-		}\
-	} else if(oy<0){\
-		for(int8_t y=floor(oy);y>=oy+ry-width-1;y--){\
-			LOOP_Z;\
-		}\
-	} else {\
-		int8_t y=floor(oy);\
-		LOOP_Z;\
-	}
-#define LOOP_X\
-	if(ox>0){\
-		for(int8_t x=floor(ox);x<=ox+rx+width;x++){\
-			LOOP_Y;\
-		}\
-	} else if(oy<0){\
-		for(int8_t x=floor(ox);x>=ox+rx-width-1;x--){\
-			LOOP_Y;\
-		}\
-	} else {\
-		int8_t x=floor(ox);\
-		LOOP_Y;\
-	}
-	LOOP_X;*/
 	double tdis = sqrt(sqr(rx)+sqr(ry)+sqr(rz));
 	double dis = tdis;
 	double dxy = pdir(0,0,rx,ry);
@@ -264,13 +166,13 @@ void Player::Step() {
 			if(c.type=="x"){
 				for(int8_t y = sy; y<=fy; y++){
 					for(int8_t z = sz; z<=fz; z++){
-						Block* b = GetBlock(nx,y,z,ch);
+						Chunk* Ch = ch;
+						Block* b = GetBlock(nx,y,z,Ch);
 						if(b==0){
 							return;
 						}
 						BlockType t = BlockTypes[b->type];
 						if(t.solid){
-							cout << "x" << endl;
 							vx = 0;
 							if(rx>0){
 								pos.x = nx-0.0001-width;
@@ -289,13 +191,13 @@ void Player::Step() {
 			if(c.type=="y"){
 				for(int8_t x = sx; x<=fx; x++){
 					for(int8_t z = sz; z<=fz; z++){
-						Block* b = GetBlock(x,ny,z,ch);
+						Chunk* Ch = ch;
+						Block* b = GetBlock(x,ny,z,Ch);
 						if(b==0){
 							return;
 						}
 						BlockType t = BlockTypes[b->type];
 						if(t.solid){
-							cout << "y" << endl;
 							vy = 0;
 							if(ry>0){
 								pos.y = ny-0.0001-width;
@@ -314,15 +216,16 @@ void Player::Step() {
 			if(c.type=="z"){
 				for(int8_t x = sx; x<=fx; x++){
 					for(int8_t y = sy; y<=fy; y++){
-						Block* b = GetBlock(x,y,nz,ch);
+						Chunk* Ch = ch;
+						Block* b = GetBlock(x,y,nz,Ch);
 						if(b==0){
 							return;
 						}
 						BlockType t = BlockTypes[b->type];
 						if(t.solid){
 							vz = 0;
-							rz = 0;
 							if(rz>0){
+								onground = true;
 								pos.z = nz-0.0001;
 							}
 							if(rz<0){
