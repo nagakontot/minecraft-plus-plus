@@ -44,7 +44,7 @@ bool Game::Loop() {
 	player.Step();
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(60,(double)Window.GetWidth()/Window.GetHeight(),0.1,1000);
+	gluPerspective(60,(double)Window.GetWidth()/Window.GetHeight(),0.01,1000);
 	gluLookAt(0,0,0,ldx(1,player.rot.d)*ldx(1,player.rot.p),ldy(1,player.rot.d)*ldx(1,player.rot.p),ldy(1,player.rot.p),0,0,-1);
 	glTranslated(-player.pos.x,-player.pos.y,-player.pos.z+player.eyeh);
 	glMatrixMode(GL_MODELVIEW);
@@ -80,7 +80,7 @@ bool Game::Loop() {
 	delta = max((double)Window.GetFrameTime(),0.0001);
 	ticks++;
 	if(ticks%10==0){
-		cout << fps << endl;
+		//cout << fps << endl;
 	}
 	GLCHECK();
 	return Window.IsOpened();

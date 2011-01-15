@@ -5,7 +5,7 @@ Player player;
 Player::Player() {
 	width = 0.3;
 	height = 1.7;
-	eyeh = 1.62;
+	eyeh = 1.6;
 	pos.x = 7.5;
 	pos.y = 7.5;
 	pos.z = 7.5;
@@ -20,7 +20,7 @@ Player::Player() {
 	respawned = false;
 	pos.cx = (uint64_t(random(rand()))<<32)+random(rand());
 	pos.cy = (uint64_t(random(rand()))<<32)+random(rand());
-	pos.cz = UINT64_HALF;
+	pos.cz = UINT64_HALF-2;
 	Window.SetCursorPosition(Window.GetWidth()/2,Window.GetHeight()/2);
 }
 
@@ -97,28 +97,28 @@ void Player::Step() {
 		double dx, dy, dz;
 		if(rx>0){
 			nx = floor(pos.x+width)+1;
-			dx = abs((nx-(pos.x+width))/rx*tdis);
+			dx = (nx-(pos.x+width))/rx*tdis;
 		} else if(rx<0){
 			nx = floor(pos.x-width)-1;
-			dx = abs((nx-(pos.x-width))/rx*tdis);
+			dx = ((nx+1)-(pos.x-width))/rx*tdis;
 		} else {
 			dx = 0;
 		}
 		if(ry>0){
 			ny = floor(pos.y+width)+1;
-			dy = abs((ny-(pos.y+width))/ry*tdis);
+			dy = (ny-(pos.y+width))/ry*tdis;
 		} else if(ry<0){
 			ny = floor(pos.y-width)-1;
-			dy = abs((ny-(pos.y-width))/ry*tdis);
+			dy = ((ny+1)-(pos.y-width))/ry*tdis;
 		} else {
 			dy = 0;
 		}
 		if(rz>0){
 			nz = floor(pos.z)+1;
-			dz = abs((nz-pos.z)/rz*tdis);
+			dz = (nz-pos.z)/rz*tdis;
 		} else if(rz<0){
 			nz = floor(pos.z-height)-1;
-			dz = abs((nz-pos.z+height)/rz*tdis);
+			dz = ((nz+1)-pos.z+height)/rz*tdis;
 		} else {
 			dz = 0;
 		}
@@ -178,7 +178,7 @@ void Player::Step() {
 								pos.x = nx-0.0001-width;
 							}
 							if(rx<0){
-								pos.x = nx+0.0001+width;
+								pos.x = nx+1.0001+width;
 							}
 							pos.y += ry/tdis*c.value;
 							pos.z += rz/tdis*c.value;
@@ -203,7 +203,7 @@ void Player::Step() {
 								pos.y = ny-0.0001-width;
 							}
 							if(ry<0){
-								pos.y = ny+0.0001+width;
+								pos.y = ny+1.0001+width;
 							}
 							pos.x += rx/tdis*c.value;
 							pos.z += rz/tdis*c.value;
@@ -229,7 +229,7 @@ void Player::Step() {
 								pos.z = nz-0.0001;
 							}
 							if(rz<0){
-								pos.z = nz+0.0001;
+								pos.z = nz+1.0001+height;
 							}
 							pos.x += rx/tdis*c.value;
 							pos.y += ry/tdis*c.value;
