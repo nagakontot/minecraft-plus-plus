@@ -2,9 +2,6 @@
 
 bool Game::Active = true;
 bool Game::Done = false;
-boost::thread UpdateThread(ChunkUpdateThread);
-boost::thread GenThread(ChunkGenThread);
-boost::thread UnloadThread(ChunkUnloadThread);
 double fps = 0;
 double tdelta = 0;
 double delta = 0;
@@ -43,7 +40,11 @@ bool Game::Loop() {
 			break;
 		}
 	}
+	//Update stuff
 	player.Step();
+	GenChunks();
+	UpdateChunks();
+	UnloadChunks();
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	gluPerspective(60,(double)Window.GetWidth()/Window.GetHeight(),0.01,1000);
@@ -77,7 +78,7 @@ bool Game::Loop() {
 						double d = pdis(player.pos.cx,player.pos.cy,player.pos.cz,c->x,c->y,c->z);
 						if(d<range){
 							Chunks.insert(c);
-						} else if(d>range*2 && c->updated && c->generated){
+						} else if(d>range*2){
 							AddChunkUnload(c);
 						}
 					}
@@ -94,13 +95,6 @@ bool Game::Loop() {
 	glBindBuffer(GL_ARRAY_BUFFER,0);
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-	//Clear any finished VBOs
-	while(!BuffersToUnload.empty() && ChunkUnload.try_lock()){
-		auto it = BuffersToUnload.begin();
-		glDeleteBuffers(1,&*it);
-		BuffersToUnload.erase(it);
-		ChunkUnload.unlock();
-	}
 	//Display the screen
 	Window.Display();
 	fps = fps*0.8+0.2/Window.GetFrameTime();
@@ -115,7 +109,4 @@ bool Game::Loop() {
 }
 void Game::Unload() {
 	Done = true;
-	while(!ChunkThreadDone || !GenThreadDone || !UnloadThreadDone){
-		sf::Sleep(0.01);
-	}
 }
