@@ -31,7 +31,6 @@ void InitGen() {
 }
 
 Chunk::Chunk(uint64_t _x, uint64_t _y, uint64_t _z) {
-	lock.lock();
 	generated = false;
 	updated = false;
 	x = _x;
@@ -51,11 +50,9 @@ Chunk::Chunk(uint64_t _x, uint64_t _y, uint64_t _z) {
 	verts = 0;
 	ChunkPos[_x][_y][_z] = this;
 	AddChunkUpdate(this);
-	lock.unlock();
 }
 
 void Chunk::Generate() {
-	lock.lock();
 	//Map generation goes here =D
 	for(uint8_t a=0;a<16;a++){
 		double cx;
@@ -156,12 +153,10 @@ void Chunk::Generate() {
 		}
 	}
 	AddChunkUpdate(this);
-	lock.unlock();
 	generated = true;
 }
 
 void Chunk::Update() {
-	lock.lock();
 	verts = 0;
 	for(int a=0;a<16;a++){
 		for(int b=0;b<16;b++){
@@ -202,8 +197,6 @@ void Chunk::Update() {
 		model = 0;
 		tex = 0;
 		updated = true;
-		vboupdated = false;
-		lock.unlock();
 		return;
 	}
 	model = new GLfloat[verts*3];
@@ -239,7 +232,7 @@ void Chunk::Update() {
 								tex[k] = (b+T_QUAD[j*2])/16;
 								tex[k+1] = (c+T_QUAD[j*2+1])/16;
 								tex[k+2] = (GLfloat(t.tex[1])+0.5)/MAX_TEXTURES;
-								i++;\
+								i++;
 							}
 						}
 						if(bl->extra&0x10){
@@ -252,7 +245,7 @@ void Chunk::Update() {
 								tex[k] = (a+T_QUAD[j*2])/16;
 								tex[k+1] = (c+T_QUAD[j*2+1])/16;
 								tex[k+2] = (GLfloat(t.tex[2])+0.5)/MAX_TEXTURES;
-								i++;\
+								i++;
 							}
 						}
 						if(bl->extra&0x8){
@@ -265,7 +258,7 @@ void Chunk::Update() {
 								tex[k] = (15-a+T_QUAD[j*2])/16;
 								tex[k+1] = (c+T_QUAD[j*2+1])/16;
 								tex[k+2] = (GLfloat(t.tex[3])+0.5)/MAX_TEXTURES;
-								i++;\
+								i++;
 							}
 						}
 						if(bl->extra&0x4){
@@ -278,7 +271,7 @@ void Chunk::Update() {
 								tex[k] = (15-a+T_QUAD[j*2])/16;
 								tex[k+1] = (b+T_QUAD[j*2+1])/16;
 								tex[k+2] = (GLfloat(t.tex[4])+0.5)/MAX_TEXTURES;
-								i++;\
+								i++;
 							}
 						}
 						if(bl->extra&0x2){
@@ -291,7 +284,7 @@ void Chunk::Update() {
 								tex[k] = (15-a+T_QUAD[j*2])/16;
 								tex[k+1] = (15-b+T_QUAD[j*2+1])/16;
 								tex[k+2] = (GLfloat(t.tex[5])+0.5)/MAX_TEXTURES;
-								i++;\
+								i++;
 							}
 						}
 					} else {
@@ -311,9 +304,12 @@ void Chunk::Update() {
 			}
 		}
 	}
+	glBindBuffer(GL_ARRAY_BUFFER,vbo);
+	glBufferData(GL_ARRAY_BUFFER,verts*6*sizeof(GLfloat),NULL,GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER,0,verts*3*sizeof(GLfloat),model);
+	glBufferSubData(GL_ARRAY_BUFFER,verts*3*sizeof(GLfloat),verts*3*sizeof(GLfloat),tex);
+	glBindBuffer(GL_ARRAY_BUFFER,0);
 	updated = true;
-	vboupdated = false;
-	lock.unlock();
 }
 
 void Chunk::AddUpdate(uint8_t x1, uint8_t y1, uint8_t z1, uint8_t x2, uint8_t y2, uint8_t z2) {
@@ -329,81 +325,63 @@ void Chunk::AddUpdate(uint8_t x1, uint8_t y1, uint8_t z1, uint8_t x2, uint8_t y2
 
 const void Chunk::Draw() {
 	if(generated && updated && verts>0){
-		if(lock.try_lock()){
-			//View culling. Thereby speeding up the rendering, suppose the culling itself isn't too intensive
-			//This needs a lot of work.
-			/*double vfov = 60*degtorad;
-			double wfov = atan(tan(vfov)*Window.GetWidth()/Window.GetHeight());
-			double diag = sqrt(sqr(tan(vfov))+sqr(tan(wfov)));
-			double dfov = atan(diag);
-			double px, py, pz;
-			if(x>player.pos.cx){
-				px = x-player.pos.cx;
+		//View culling. Thereby speeding up the rendering, suppose the culling itself isn't too intensive
+		//This needs a lot of work.
+		/*double vfov = 60*degtorad;
+		double wfov = atan(tan(vfov)*Window.GetWidth()/Window.GetHeight());
+		double diag = sqrt(sqr(tan(vfov))+sqr(tan(wfov)));
+		double dfov = atan(diag);
+		double px, py, pz;
+		if(x>player.pos.cx){
+			px = x-player.pos.cx;
+		} else {
+			px = player.pos.cx-x;
+			px = -px;
+		}
+		px -= player.pos.x/16-0.5;
+		if(y>player.pos.cy){
+			py = y-player.pos.cy;
+		} else {
+			py = player.pos.cy-y;
+			py = -py;
+		}
+		py -= player.pos.y/16-0.5;
+		if(z>player.pos.cz){
+			pz = z-player.pos.cz;
+		} else {
+			pz = player.pos.cz-z;
+			pz = -pz;
+		}
+		pz -= player.pos.z/16-0.5;
+		double dis = sqrt(sqr(px)+sqr(py)+sqr(pz));
+		double ad = 2*acos(sqrt(3.0)/2/dis);
+		double da = acos((ldx(1,player.rot.d)*ldx(1,player.rot.p)*px+ldy(1,player.rot.d)*ldx(1,player.rot.p)*py+ldy(1,player.rot.p)*pz)/dis);
+		if(dis<2 || da<dfov+ad){*/
+			glLoadIdentity();
+			double dx, dy, dz;
+			if(player.pos.cx>x){
+				dx = player.pos.cx-x;
 			} else {
-				px = player.pos.cx-x;
-				px = -px;
+				dx = x-player.pos.cx;
+				dx = -dx;
 			}
-			px -= player.pos.x/16-0.5;
-			if(y>player.pos.cy){
-				py = y-player.pos.cy;
+			if(player.pos.cy>y){
+				dy = player.pos.cy-y;
 			} else {
-				py = player.pos.cy-y;
-				py = -py;
+				dy = y-player.pos.cy;
+				dy = -dy;
 			}
-			py -= player.pos.y/16-0.5;
-			if(z>player.pos.cz){
-				pz = z-player.pos.cz;
+			if(player.pos.cz>z){
+				dz = player.pos.cz-z;
 			} else {
-				pz = player.pos.cz-z;
-				pz = -pz;
+				dz = z-player.pos.cz;
+				dz = -dz;
 			}
-			pz -= player.pos.z/16-0.5;
-			double dis = sqrt(sqr(px)+sqr(py)+sqr(pz));
-			double ad = 2*acos(sqrt(3.0)/2/dis);
-			double da = acos((ldx(1,player.rot.d)*ldx(1,player.rot.p)*px+ldy(1,player.rot.d)*ldx(1,player.rot.p)*py+ldy(1,player.rot.p)*pz)/dis);
-			if(dis<2 || da<dfov+ad){*/
-				glLoadIdentity();
-				double dx, dy, dz;
-				if(player.pos.cx>x){
-					dx = player.pos.cx-x;
-				} else {
-					dx = x-player.pos.cx;
-					dx = -dx;
-				}
-				if(player.pos.cy>y){
-					dy = player.pos.cy-y;
-				} else {
-					dy = y-player.pos.cy;
-					dy = -dy;
-				}
-				if(player.pos.cz>z){
-					dz = player.pos.cz-z;
-				} else {
-					dz = z-player.pos.cz;
-					dz = -dz;
-				}
-				glTranslated(-16*dx, -16*dy, -16*dz);
-				glBindBuffer(GL_ARRAY_BUFFER,vbo);
-				if(!vboupdated){
-					glBufferData(GL_ARRAY_BUFFER,verts*6*sizeof(GLfloat),NULL,GL_DYNAMIC_DRAW);
-					glBufferSubData(GL_ARRAY_BUFFER,0,verts*3*sizeof(GLfloat),model);
-					glBufferSubData(GL_ARRAY_BUFFER,verts*3*sizeof(GLfloat),verts*3*sizeof(GLfloat),tex);
-					vboupdated = true;
-				} else {
-					if(tex!=0){
-						delete[] tex;
-						tex = 0;
-					}
-					if(model!=0){
-						delete[] model;
-						model = 0;
-					}
-				}
-				glVertexPointer(3,GL_FLOAT,0,0);
-				glTexCoordPointer(3,GL_FLOAT,0,(char*)NULL+verts*3*sizeof(GLfloat));
-				glDrawArrays(GL_QUADS,0,verts);
-			}
-			lock.unlock();
+			glTranslated(-16*dx, -16*dy, -16*dz);
+			glBindBuffer(GL_ARRAY_BUFFER,vbo);
+			glVertexPointer(3,GL_FLOAT,0,0);
+			glTexCoordPointer(3,GL_FLOAT,0,(char*)NULL+verts*3*sizeof(GLfloat));
+			glDrawArrays(GL_QUADS,0,verts);
 		//}
 	}
 }
@@ -422,124 +400,89 @@ Chunk* GetChunk(uint64_t x, uint64_t y, uint64_t z, bool generate) {
 set<Chunk*> Chunks;
 map<uint64_t,map<uint64_t,map<uint64_t,Chunk*>>> ChunkPos;
 
-void ChunkUpdateThread() {
-	while(!Game::Done){
-		if(ChunksToUpdate.empty()){
-			sf::Sleep(0.01);
-		} else {
-			ChunkUpdate.lock();
-			auto it = ChunksToUpdate.begin();
-			Chunk* c = *it;
-			ChunksToUpdate.erase(it);
-			ChunkUpdate.unlock();
-			c->Update();
-		}
+void UpdateChunks() {
+	while(!ChunksToUpdate.empty()){
+		auto it = ChunksToUpdate.begin();
+		Chunk* c = *it;
+		ChunksToUpdate.erase(it);
+		c->Update();
 	}
-	ChunkThreadDone = true;
 }
 
-void ChunkGenThread() {
-	while(!Game::Done){
-		if(ChunksToGen.empty()){
-			sf::Sleep(0.01);
-		} else {
-			ChunkGen.lock();
-			auto it = ChunksToGen.begin();
-			Chunk* c = *it;
-			ChunksToGen.erase(it);
-			ChunkGen.unlock();
-			c->Generate();
-			AddChunkUpdate(c);
-		}
+bool GetChunkComp(Chunk* a, Chunk* b){
+	double da = pdis(player.pos.cx,player.pos.cy,player.pos.cz,a->x,a->y,a->z);
+	double db = pdis(player.pos.cx,player.pos.cy,player.pos.cz,b->x,b->y,b->z);
+	return da<db;
+}
+void GenChunks() {
+	sort(ChunksToGen.begin(),ChunksToGen.end(),GetChunkComp);
+	for(int f=0;f<4 && !ChunksToGen.empty(); f++){
+		Chunk* c = ChunksToGen.front();
+		ChunksToGen.pop_front();
+		c->Generate();
+		AddChunkUpdate(c);
 	}
-	GenThreadDone = true;
 }
 
-void ChunkUnloadThread() {
-	while(!Game::Done){
-		if(ChunksToUnload.empty()){
-			sf::Sleep(0.01);
-		} else {
-			ChunkUnload.lock();
-			auto it = ChunksToUnload.begin();
-			Chunk* c = *it;
-			ChunksToUnload.erase(it);
-			ChunkUnload.unlock();
-			ChunkGen.lock();
-			auto it2 = find(ChunksToGen.begin(),ChunksToGen.end(),c);
-			if(it2!=ChunksToGen.end()){
-				ChunksToGen.erase(it2);
-			}
-			ChunkGen.unlock();
-			ChunkUpdate.lock();
-			auto it3 = find(ChunksToUpdate.begin(),ChunksToUpdate.end(),c);
-			if(it3!=ChunksToUpdate.end()){
-				ChunksToUpdate.erase(it3);
-			}
-			ChunkUpdate.unlock();
-			c->lock.lock();
-			ChunkPos[c->x][c->y][c->z] = 0;
-			if(c->xp!=0){
-				c->xp->xn = 0;
-			}
-			if(c->xn!=0){
-				c->xn->xp = 0;
-			}
-			if(c->yp!=0){
-				c->yp->yn = 0;
-			}
-			if(c->yn!=0){
-				c->yn->yp = 0;
-			}
-			if(c->zp!=0){
-				c->zp->zn = 0;
-			}
-			if(c->zn!=0){
-				c->zn->zp = 0;
-			}
-			ChunkUnload.lock();
-			BuffersToUnload.insert(c->vbo);
-			ChunkUnload.unlock();
-			if(c->model!=0){
-				delete c->model;
-			}
-			if(c->tex!=0){
-				delete c->tex;
-			}
-			c->lock.unlock();
-			delete c;
+void UnloadChunks() {
+	while(!ChunksToUnload.empty()){
+		auto it = ChunksToUnload.begin();
+		Chunk* c = *it;
+		ChunksToUnload.erase(it);
+		auto it2 = find(ChunksToGen.begin(),ChunksToGen.end(),c);
+		if(it2!=ChunksToGen.end()){
+			ChunksToGen.erase(it2);
 		}
+		auto it3 = find(ChunksToUpdate.begin(),ChunksToUpdate.end(),c);
+		if(it3!=ChunksToUpdate.end()){
+			ChunksToUpdate.erase(it3);
+		}
+		auto it4 = find(Chunks.begin(),Chunks.end(),c);
+		if(it4!=Chunks.end()){
+			Chunks.erase(it4);
+		}
+		ChunkPos[c->x][c->y][c->z] = 0;
+		if(c->xp!=0){
+			c->xp->xn = 0;
+		}
+		if(c->xn!=0){
+			c->xn->xp = 0;
+		}
+		if(c->yp!=0){
+			c->yp->yn = 0;
+		}
+		if(c->yn!=0){
+			c->yn->yp = 0;
+		}
+		if(c->zp!=0){
+			c->zp->zn = 0;
+		}
+		if(c->zn!=0){
+			c->zn->zp = 0;
+		}
+		glDeleteBuffers(1,&c->vbo);
+		if(c->model!=0){
+			delete c->model;
+		}
+		if(c->tex!=0){
+			delete c->tex;
+		}
+		delete c;
 	}
-	UnloadThreadDone = true;
 }
 
 void AddChunkUpdate(Chunk* c) {
 	if(c->generated){
-		ChunkUpdate.lock();
 		ChunksToUpdate.insert(c);
-		ChunkUpdate.unlock();
 	} else {
-		ChunkGen.lock();
-		ChunksToGen.insert(c);
-		ChunkGen.unlock();
+		ChunksToGen.push_back(c);
 	}
 }
 
 unordered_set<Chunk*> ChunksToUpdate;
-boost::mutex ChunkUpdate;
-bool ChunkThreadDone = false;
-
-unordered_set<Chunk*> ChunksToGen;
-boost::mutex ChunkGen;
-bool GenThreadDone = false;
-
+deque<Chunk*> ChunksToGen;
 unordered_set<Chunk*> ChunksToUnload;
-boost::mutex ChunkUnload;
-bool UnloadThreadDone;
-unordered_set<GLuint> BuffersToUnload;
 
 void AddChunkUnload(Chunk* c) {
-	ChunkUnload.lock();
 	ChunksToUnload.insert(c);
-	ChunkUnload.unlock();
 }

@@ -5,10 +5,8 @@ struct Chunk {
 	GLfloat *model, *tex;
 	GLuint vbo;
 	uint16_t verts;
-	boost::mutex lock;
 	bool generated;
 	bool updated;
-	bool vboupdated;
 	Chunk(uint64_t x, uint64_t y, uint64_t z);
 	const void Draw();
 	void Update();
@@ -22,21 +20,12 @@ extern set<Chunk*> Chunks;
 extern map<uint64_t,map<uint64_t,map<uint64_t,Chunk*>>> ChunkPos;
 
 void InitGen();
-void ChunkUpdateThread();
-void ChunkGenThread();
-void ChunkUnloadThread();
+void UpdateChunks();
+void GenChunks();
+void UnloadChunks();
 void AddChunkUnload(Chunk* c);
 void AddChunkUpdate(Chunk* c);
 
 extern unordered_set<Chunk*> ChunksToUpdate;
-extern boost::mutex ChunkUpdate;
-extern bool ChunkThreadDone;
-
-extern unordered_set<Chunk*> ChunksToGen;
-extern boost::mutex ChunkGen;
-extern bool GenThreadDone;
-
+extern deque<Chunk*> ChunksToGen;
 extern unordered_set<Chunk*> ChunksToUnload;
-extern boost::mutex ChunkUnload;
-extern bool UnloadThreadDone;
-extern unordered_set<GLuint> BuffersToUnload;
