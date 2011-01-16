@@ -3,6 +3,5 @@ Add water block to fill up low areas.
 Mining and placing of blocks. Something with octrees?
 Multiplayer server. Deal with this later when Alex gets enough experience.
 Saving and loading of chunks.
-Cave generation eventually.
-Redo player movement.
 Redo a bunch of stuff.
+Pay attention to my TODO list...

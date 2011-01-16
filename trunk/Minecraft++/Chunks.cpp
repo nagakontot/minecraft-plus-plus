@@ -31,6 +31,7 @@ void InitGen() {
 }
 
 Chunk::Chunk(uint64_t _x, uint64_t _y, uint64_t _z) {
+	lock.lock();
 	generated = false;
 	updated = false;
 	x = _x;
@@ -50,6 +51,7 @@ Chunk::Chunk(uint64_t _x, uint64_t _y, uint64_t _z) {
 	verts = 0;
 	ChunkPos[_x][_y][_z] = this;
 	AddChunkUpdate(this);
+	lock.unlock();
 }
 
 void Chunk::Generate() {
@@ -153,22 +155,10 @@ void Chunk::Generate() {
 			}
 		}
 	}
-	generated = true;
 	AddChunkUpdate(this);
 	lock.unlock();
+	generated = true;
 }
-
-#define append(x,y,xt,yt) for(int j=0;j<4;j++){\
-						int k = 3*i;\
-						int r = 3*j;\
-						model[k] = x[r]+a;\
-						model[k+1] = x[r+1]+b;\
-						model[k+2] = x[r+2]+c;\
-						tex[k] = (xt+T_QUAD[j*2])/16;\
-						tex[k+1] = (yt+T_QUAD[j*2+1])/16;\
-						tex[k+2] = (GLfloat(t.tex[y])+0.5)/MAX_TEXTURES;\
-						i++;\
-					}
 
 void Chunk::Update() {
 	lock.lock();
@@ -227,22 +217,82 @@ void Chunk::Update() {
 				if(bl->extra&1){
 					if(t.model==0 && t.tex!=0){
 						if(bl->extra&0x40){
-							append(M_XP,0,15-b,c);
+							for(int j=0;j<4;j++){
+								int k = 3*i;
+								int r = 3*j;
+								model[k] = M_XP[r]+a;
+								model[k+1] = M_XP[r+1]+b;
+								model[k+2] = M_XP[r+2]+c;
+								tex[k] = (15-b+T_QUAD[j*2])/16;
+								tex[k+1] = (c+T_QUAD[j*2+1])/16;
+								tex[k+2] = (GLfloat(t.tex[0])+0.5)/MAX_TEXTURES;
+								i++;
+							}
 						}
 						if(bl->extra&0x20){
-							append(M_XN,1,b,c);
+							for(int j=0;j<4;j++){
+								int k = 3*i;
+								int r = 3*j;
+								model[k] = M_XN[r]+a;
+								model[k+1] = M_XN[r+1]+b;
+								model[k+2] = M_XN[r+2]+c;
+								tex[k] = (b+T_QUAD[j*2])/16;
+								tex[k+1] = (c+T_QUAD[j*2+1])/16;
+								tex[k+2] = (GLfloat(t.tex[1])+0.5)/MAX_TEXTURES;
+								i++;\
+							}
 						}
 						if(bl->extra&0x10){
-							append(M_YP,2,a,c);
+							for(int j=0;j<4;j++){
+								int k = 3*i;
+								int r = 3*j;
+								model[k] = M_YP[r]+a;
+								model[k+1] = M_YP[r+1]+b;
+								model[k+2] = M_YP[r+2]+c;
+								tex[k] = (a+T_QUAD[j*2])/16;
+								tex[k+1] = (c+T_QUAD[j*2+1])/16;
+								tex[k+2] = (GLfloat(t.tex[2])+0.5)/MAX_TEXTURES;
+								i++;\
+							}
 						}
 						if(bl->extra&0x8){
-							append(M_YN,3,15-a,c);
+							for(int j=0;j<4;j++){
+								int k = 3*i;
+								int r = 3*j;
+								model[k] = M_YN[r]+a;
+								model[k+1] = M_YN[r+1]+b;
+								model[k+2] = M_YN[r+2]+c;
+								tex[k] = (15-a+T_QUAD[j*2])/16;
+								tex[k+1] = (c+T_QUAD[j*2+1])/16;
+								tex[k+2] = (GLfloat(t.tex[3])+0.5)/MAX_TEXTURES;
+								i++;\
+							}
 						}
 						if(bl->extra&0x4){
-							append(M_ZP,4,15-a,b);
+							for(int j=0;j<4;j++){
+								int k = 3*i;
+								int r = 3*j;
+								model[k] = M_ZP[r]+a;
+								model[k+1] = M_ZP[r+1]+b;
+								model[k+2] = M_ZP[r+2]+c;
+								tex[k] = (15-a+T_QUAD[j*2])/16;
+								tex[k+1] = (b+T_QUAD[j*2+1])/16;
+								tex[k+2] = (GLfloat(t.tex[4])+0.5)/MAX_TEXTURES;
+								i++;\
+							}
 						}
 						if(bl->extra&0x2){
-							append(M_ZN,5,15-a,15-b);
+							for(int j=0;j<4;j++){
+								int k = 3*i;
+								int r = 3*j;
+								model[k] = M_ZN[r]+a;
+								model[k+1] = M_ZN[r+1]+b;
+								model[k+2] = M_ZN[r+2]+c;
+								tex[k] = (15-a+T_QUAD[j*2])/16;
+								tex[k+1] = (15-b+T_QUAD[j*2+1])/16;
+								tex[k+2] = (GLfloat(t.tex[5])+0.5)/MAX_TEXTURES;
+								i++;\
+							}
 						}
 					} else {
 						for(int j=0; j<t.verts; j++){
@@ -280,7 +330,7 @@ void Chunk::AddUpdate(uint8_t x1, uint8_t y1, uint8_t z1, uint8_t x2, uint8_t y2
 const void Chunk::Draw() {
 	if(generated && updated && verts>0){
 		if(lock.try_lock()){
-			//View culling. Thereby speeding up the rendering.
+			//View culling. Thereby speeding up the rendering, suppose the culling itself isn't too intensive
 			//This needs a lot of work.
 			/*double vfov = 60*degtorad;
 			double wfov = atan(tan(vfov)*Window.GetWidth()/Window.GetHeight());
@@ -369,7 +419,7 @@ Chunk* GetChunk(uint64_t x, uint64_t y, uint64_t z, bool generate) {
 	return 0;
 }
 
-vector<Chunk*> Chunks;
+set<Chunk*> Chunks;
 map<uint64_t,map<uint64_t,map<uint64_t,Chunk*>>> ChunkPos;
 
 void ChunkUpdateThread() {
@@ -382,22 +432,111 @@ void ChunkUpdateThread() {
 			Chunk* c = *it;
 			ChunksToUpdate.erase(it);
 			ChunkUpdate.unlock();
-			if(!c->generated){
-				c->Generate();
-			} else {
-				c->Update();
-			}
+			c->Update();
 		}
 	}
 	ChunkThreadDone = true;
 }
 
+void ChunkGenThread() {
+	while(!Game::Done){
+		if(ChunksToGen.empty()){
+			sf::Sleep(0.01);
+		} else {
+			ChunkGen.lock();
+			auto it = ChunksToGen.begin();
+			Chunk* c = *it;
+			ChunksToGen.erase(it);
+			ChunkGen.unlock();
+			c->Generate();
+			AddChunkUpdate(c);
+		}
+	}
+	GenThreadDone = true;
+}
+
+void ChunkUnloadThread() {
+	while(!Game::Done){
+		if(ChunksToUnload.empty()){
+			sf::Sleep(0.01);
+		} else {
+			ChunkUnload.lock();
+			auto it = ChunksToUnload.begin();
+			Chunk* c = *it;
+			c->lock.lock();
+			ChunksToUnload.erase(it);
+			ChunkGen.lock();
+			auto it2 = find(ChunksToGen.begin(),ChunksToGen.end(),c);
+			if(it2!=ChunksToGen.end()){
+				ChunksToGen.erase(it2);
+			}
+			ChunkGen.unlock();
+			ChunkUpdate.lock();
+			auto it3 = find(ChunksToUpdate.begin(),ChunksToUpdate.end(),c);
+			if(it3!=ChunksToUpdate.end()){
+				ChunksToUpdate.erase(it3);
+			}
+			ChunkUpdate.unlock();
+			ChunkPos[c->x][c->y][c->z] = 0;
+			if(c->xp!=0){
+				c->xp->xn = 0;
+			}
+			if(c->xn!=0){
+				c->xn->xp = 0;
+			}
+			if(c->yp!=0){
+				c->yp->yn = 0;
+			}
+			if(c->yn!=0){
+				c->yn->yp = 0;
+			}
+			if(c->zp!=0){
+				c->zp->zn = 0;
+			}
+			if(c->zn!=0){
+				c->zn->zp = 0;
+			}
+			BuffersToUnload.insert(c->vbo);
+			if(c->model!=0){
+				delete c->model;
+			}
+			if(c->tex!=0){
+				delete c->tex;
+			}
+			delete c;
+			ChunkUnload.unlock();
+		}
+	}
+	UnloadThreadDone = true;
+}
+
 void AddChunkUpdate(Chunk* c) {
-	ChunkUpdate.lock();
-	ChunksToUpdate.insert(c);
-	ChunkUpdate.unlock();
+	if(c->generated){
+		ChunkUpdate.lock();
+		ChunksToUpdate.insert(c);
+		ChunkUpdate.unlock();
+	} else {
+		ChunkGen.lock();
+		ChunksToGen.insert(c);
+		ChunkGen.unlock();
+	}
 }
 
 unordered_set<Chunk*> ChunksToUpdate;
 boost::mutex ChunkUpdate;
 bool ChunkThreadDone = false;
+
+unordered_set<Chunk*> ChunksToGen;
+boost::mutex ChunkGen;
+bool GenThreadDone = false;
+
+unordered_set<Chunk*> ChunksToUnload;
+boost::mutex ChunkUnload;
+bool UnloadThreadDone;
+unordered_set<GLuint> BuffersToUnload;
+
+void AddChunkUnload(Chunk* c) {
+	ChunkUnload.lock();
+	ChunksToUnload.insert(c);
+	ChunkUnload.unlock();
+}
