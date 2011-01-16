@@ -115,6 +115,9 @@ void Player::Step() {
 	}
 	Chunk* ch = GetChunk(pos.cx,pos.cy,pos.cz);
 	if(ch==0 || ch->generated==false){
+		vx = 0;
+		vy = 0;
+		vz = 0;
 		return;
 	}
 	vz += gravity*delta;
@@ -265,12 +268,13 @@ void Player::Step() {
 						}
 						BlockType t = BlockTypes[b->type];
 						if(t.solid){
-							vz = 0;
 							if(rz>0){
+								vz = 0;
 								onground = true;
 								pos.z = nz-0.0001;
 							}
-							if(rz<0){
+							if(rz<0 && !flying){
+								vz = 0;
 								pos.z = nz+1.0001+height;
 							}
 							pos.x += rx/tdis*c.value;
