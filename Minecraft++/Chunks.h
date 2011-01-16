@@ -18,12 +18,25 @@ struct Chunk {
 
 Chunk* GetChunk(uint64_t x, uint64_t y, uint64_t z, bool generate = true);
 
-extern vector<Chunk*> Chunks;
+extern set<Chunk*> Chunks;
 extern map<uint64_t,map<uint64_t,map<uint64_t,Chunk*>>> ChunkPos;
 
 void InitGen();
 void ChunkUpdateThread();
+void ChunkGenThread();
+void ChunkUnloadThread();
+void AddChunkUnload(Chunk* c);
 void AddChunkUpdate(Chunk* c);
+
 extern unordered_set<Chunk*> ChunksToUpdate;
 extern boost::mutex ChunkUpdate;
 extern bool ChunkThreadDone;
+
+extern unordered_set<Chunk*> ChunksToGen;
+extern boost::mutex ChunkGen;
+extern bool GenThreadDone;
+
+extern unordered_set<Chunk*> ChunksToUnload;
+extern boost::mutex ChunkUnload;
+extern bool UnloadThreadDone;
+extern unordered_set<GLuint> BuffersToUnload;

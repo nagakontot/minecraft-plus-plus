@@ -41,6 +41,23 @@ void Player::Step() {
 	} else {
 		respawned = false;
 	}
+	static bool flying(false);
+	static bool lflying(false);
+	if(input.IsKeyDown(sf::Key::F)){
+		if(!lflying){
+			flying = !flying;
+			if(flying){
+				speed = 32;
+				jump = 16;
+			} else {
+				speed = 8;
+				jump = 5.5;
+			}
+		}
+		lflying = true;
+	} else {
+		lflying = false;
+	}
 	//Mouse stuff
 	int mx = input.GetMouseX()-Window.GetWidth()/2;
 	int my = input.GetMouseY()-Window.GetHeight()/2;
@@ -61,7 +78,7 @@ void Player::Step() {
 		BlockType t1 = BlockTypes[bh1->type];
 		BlockType t2 = BlockTypes[bh2->type];
 		if(t1.solid || t2.solid){
-			pos.z -= 1;
+			pos.z -= 2;
 			pos.Update();
 			return;
 		}
@@ -92,7 +109,8 @@ void Player::Step() {
 		vx *= d;
 		vy *= d;
 	}
-	if(input.IsKeyDown(sf::Key::Space) && onground){
+	//if(input.IsKeyDown(sf::Key::Space) && onground){
+	if(onground){
 		vz = -jump;
 	}
 	Chunk* ch = GetChunk(pos.cx,pos.cy,pos.cz);

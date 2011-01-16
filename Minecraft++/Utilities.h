@@ -64,8 +64,18 @@ const inline double ldx (double len, double dir) {
 const inline double ldy (double len, double dir) {
 	return sin(dir*degtorad)*len;
 }
+const inline uint64_t dif(uint64_t a, uint64_t b){
+	if(a>b){
+		return a-b;
+	} else {
+		return b-a;
+	}
+}
 const inline double pdis (double x1, double y1, double x2, double y2) {
 	return sqrt(sqr(x1-x2)+sqr(y1-y2));
+}
+const inline double pdis (uint64_t x1, uint64_t y1, uint64_t z1, uint64_t x2, uint64_t y2, uint64_t z2) {
+	return sqrt(sqr(dif(x1,x2))+sqr(dif(y1,y2))+sqr(dif(z1,z2)));
 }
 const inline double pdir (double x1, double y1, double x2, double y2) {
 	return radtodeg*atan2(y2-y1,x2-x1);

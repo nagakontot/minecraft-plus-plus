@@ -2,7 +2,9 @@
 
 bool Game::Active = true;
 bool Game::Done = false;
-boost::thread Thread(ChunkUpdateThread);
+boost::thread UpdateThread(ChunkUpdateThread);
+boost::thread GenThread(ChunkGenThread);
+boost::thread UnloadThread(ChunkUnloadThread);
 double fps = 0;
 double tdelta = 0;
 double delta = 0;
@@ -53,13 +55,32 @@ bool Game::Loop() {
 	//SkyDraw();
 	glClear(GL_DEPTH_BUFFER_BIT);
 	//Draw everything
+#ifdef _DEBUG
 	uint8_t range = 7;
+#else
+	uint8_t range = 10;
+#endif
 	if(ticks%30==0){//Every so often run through and clean up the chunk list
 		Chunks.clear();
 		for(uint8_t a=0;a<=range*2;a++){
 			for(uint8_t b=0;b<=range*2;b++){
 				for(uint8_t c=0;c<=range*2;c++){
-					Chunks.push_back(GetChunk(player.pos.cx+a-range,player.pos.cy+b-range,player.pos.cz+c-range));
+					GetChunk(player.pos.cx+a-range,player.pos.cy+b-range,player.pos.cz+c-range,true);
+				}
+			}
+		}
+		for(auto x=ChunkPos.begin();x!=ChunkPos.end();x++){
+			for(auto y=x->second.begin();y!=x->second.end();y++){
+				for(auto z=y->second.begin();z!=y->second.end();z++){
+					Chunk* c=z->second;
+					if(c!=0){
+						double d = pdis(player.pos.cx,player.pos.cy,player.pos.cz,c->x,c->y,c->z);
+						if(d<range){
+							Chunks.insert(c);
+						} else if(d>range*2){
+							AddChunkUnload(c);
+						}
+					}
 				}
 			}
 		}
@@ -73,11 +94,19 @@ bool Game::Loop() {
 	glBindBuffer(GL_ARRAY_BUFFER,0);
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	//Clear any finished VBOs
+	while(!BuffersToUnload.empty()){
+		ChunkUnload.lock();
+		auto it = BuffersToUnload.begin();
+		glDeleteBuffers(1,&*it);
+		BuffersToUnload.erase(it);
+		ChunkUnload.unlock();
+	}
 	//Display the screen
 	Window.Display();
 	fps = fps*0.8+0.2/Window.GetFrameTime();
 	tdelta += Window.GetFrameTime();
-	delta = max((double)Window.GetFrameTime(),0.0001);
+	delta = min(max((double)Window.GetFrameTime(),0.0001),0.1);
 	ticks++;
 	if(ticks%10==0){
 		//cout << fps << endl;
@@ -87,7 +116,7 @@ bool Game::Loop() {
 }
 void Game::Unload() {
 	Done = true;
-	while(!ChunkThreadDone){
+	while(!ChunkThreadDone || !GenThreadDone || !UnloadThreadDone){
 		sf::Sleep(0.01);
 	}
 }

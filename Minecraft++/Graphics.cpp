@@ -17,15 +17,6 @@ void InitGraphics() {
 	glAlphaFunc(GL_GREATER,0);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
-	//glEnableClientState(GL_VERTEX_ARRAY);
-	//glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-	//glFogi(GL_FOG_MODE,GL_LINEAR);
-	//glFogi(GL_FOG_START,0);
-	//glFogi(GL_FOG_END,7);
-	//glFogi(GL_FOG_COORD_SRC,GL_FRAGMENT_DEPTH);
-	//GLfloat color[4] = {1,1,1,1};
-	//glFogfv(GL_FOG_COLOR,color);
-	//glEnable(GL_FOG);
 	glGenTextures(1,&TEX);
 	glBindTexture(GL_TEXTURE_3D,TEX);
 	glTexParameteri(GL_TEXTURE_3D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
