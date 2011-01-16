@@ -463,8 +463,8 @@ void ChunkUnloadThread() {
 			ChunkUnload.lock();
 			auto it = ChunksToUnload.begin();
 			Chunk* c = *it;
-			c->lock.lock();
 			ChunksToUnload.erase(it);
+			ChunkUnload.unlock();
 			ChunkGen.lock();
 			auto it2 = find(ChunksToGen.begin(),ChunksToGen.end(),c);
 			if(it2!=ChunksToGen.end()){
@@ -477,6 +477,7 @@ void ChunkUnloadThread() {
 				ChunksToUpdate.erase(it3);
 			}
 			ChunkUpdate.unlock();
+			c->lock.lock();
 			ChunkPos[c->x][c->y][c->z] = 0;
 			if(c->xp!=0){
 				c->xp->xn = 0;
@@ -496,15 +497,17 @@ void ChunkUnloadThread() {
 			if(c->zn!=0){
 				c->zn->zp = 0;
 			}
+			ChunkUnload.lock();
 			BuffersToUnload.insert(c->vbo);
+			ChunkUnload.unlock();
 			if(c->model!=0){
 				delete c->model;
 			}
 			if(c->tex!=0){
 				delete c->tex;
 			}
+			c->lock.unlock();
 			delete c;
-			ChunkUnload.unlock();
 		}
 	}
 	UnloadThreadDone = true;

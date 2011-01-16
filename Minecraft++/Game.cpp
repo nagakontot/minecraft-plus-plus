@@ -77,7 +77,7 @@ bool Game::Loop() {
 						double d = pdis(player.pos.cx,player.pos.cy,player.pos.cz,c->x,c->y,c->z);
 						if(d<range){
 							Chunks.insert(c);
-						} else if(d>range*2){
+						} else if(d>range*2 && c->updated && c->generated){
 							AddChunkUnload(c);
 						}
 					}
@@ -95,8 +95,7 @@ bool Game::Loop() {
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	//Clear any finished VBOs
-	while(!BuffersToUnload.empty()){
-		ChunkUnload.lock();
+	while(!BuffersToUnload.empty() && ChunkUnload.try_lock()){
 		auto it = BuffersToUnload.begin();
 		glDeleteBuffers(1,&*it);
 		BuffersToUnload.erase(it);
