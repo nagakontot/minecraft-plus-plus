@@ -57,9 +57,9 @@ bool Game::Loop() {
 	glClear(GL_DEPTH_BUFFER_BIT);
 	//Draw everything
 #ifdef _DEBUG
-	uint8_t range = 7;
+	uint8_t range = 8;
 #else
-	uint8_t range = 10;
+	uint8_t range = 12;
 #endif
 	if(ticks%30==0){//Every so often run through and clean up the chunk list
 		Chunks.clear();
@@ -83,6 +83,15 @@ bool Game::Loop() {
 						}
 					}
 				}
+			}
+		}
+		sort(ChunksToGen.begin(),ChunksToGen.end(),ChunkComp);
+		while(!ChunksToGen.empty()){
+			Chunk* c = ChunksToGen.back();
+			if(pdis(player.pos.cx,player.pos.cy,player.pos.cz,c->x,c->y,c->z)>range*1.5){
+				ChunksToGen.pop_back();
+			} else {
+				break;
 			}
 		}
 	}
