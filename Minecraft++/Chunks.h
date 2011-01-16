@@ -2,7 +2,6 @@ struct Chunk {
 	uint64_t x, y, z;
 	Chunk *xp, *xn, *yp, *yn, *zp, *zn;
 	Block Blocks[4096];
-	GLfloat *model, *tex;
 	GLuint vbo;
 	uint16_t verts;
 	bool generated;
@@ -29,3 +28,5 @@ void AddChunkUpdate(Chunk* c);
 extern unordered_set<Chunk*> ChunksToUpdate;
 extern deque<Chunk*> ChunksToGen;
 extern unordered_set<Chunk*> ChunksToUnload;
+
+bool ChunkComp(Chunk* a, Chunk* b);

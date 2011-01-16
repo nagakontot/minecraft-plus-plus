@@ -45,8 +45,6 @@ Chunk::Chunk(uint64_t _x, uint64_t _y, uint64_t _z) {
 	glGenBuffers(1,&vbo);
 	glBindBuffer(GL_ARRAY_BUFFER,vbo);
 	glBindBuffer(GL_ARRAY_BUFFER,0);
-	model = 0;
-	tex = 0;
 	verts = 0;
 	ChunkPos[_x][_y][_z] = this;
 	AddChunkUpdate(this);
@@ -191,16 +189,15 @@ void Chunk::Update() {
 			}
 		}
 	}
-	delete[] model;
-	delete[] tex;
 	if(verts==0){
-		model = 0;
-		tex = 0;
 		updated = true;
 		return;
 	}
-	model = new GLfloat[verts*3];
-	tex = new GLfloat[verts*3];
+	glBindBuffer(GL_ARRAY_BUFFER,vbo);
+	glBufferData(GL_ARRAY_BUFFER,verts*6*sizeof(GLfloat),NULL,GL_STATIC_DRAW);
+	void* ptr = glMapBuffer(GL_ARRAY_BUFFER,GL_WRITE_ONLY);
+	GLfloat* model = (GLfloat*)ptr;
+	GLfloat* tex = ((GLfloat*)ptr)+verts*3;
 	int i = 0;
 	for(int a=0;a<16;a++){
 		for(int b=0;b<16;b++){
@@ -304,10 +301,7 @@ void Chunk::Update() {
 			}
 		}
 	}
-	glBindBuffer(GL_ARRAY_BUFFER,vbo);
-	glBufferData(GL_ARRAY_BUFFER,verts*6*sizeof(GLfloat),NULL,GL_DYNAMIC_DRAW);
-	glBufferSubData(GL_ARRAY_BUFFER,0,verts*3*sizeof(GLfloat),model);
-	glBufferSubData(GL_ARRAY_BUFFER,verts*3*sizeof(GLfloat),verts*3*sizeof(GLfloat),tex);
+	glUnmapBuffer(GL_ARRAY_BUFFER);
 	glBindBuffer(GL_ARRAY_BUFFER,0);
 	updated = true;
 }
@@ -409,14 +403,13 @@ void UpdateChunks() {
 	}
 }
 
-bool GetChunkComp(Chunk* a, Chunk* b){
+bool ChunkComp(Chunk* a, Chunk* b){
 	double da = pdis(player.pos.cx,player.pos.cy,player.pos.cz,a->x,a->y,a->z);
 	double db = pdis(player.pos.cx,player.pos.cy,player.pos.cz,b->x,b->y,b->z);
 	return da<db;
 }
 void GenChunks() {
-	sort(ChunksToGen.begin(),ChunksToGen.end(),GetChunkComp);
-	for(int f=0;f<4 && !ChunksToGen.empty(); f++){
+	for(int f=0;f<10 && !ChunksToGen.empty(); f++){
 		Chunk* c = ChunksToGen.front();
 		ChunksToGen.pop_front();
 		c->Generate();
@@ -461,12 +454,6 @@ void UnloadChunks() {
 			c->zn->zp = 0;
 		}
 		glDeleteBuffers(1,&c->vbo);
-		if(c->model!=0){
-			delete c->model;
-		}
-		if(c->tex!=0){
-			delete c->tex;
-		}
 		delete c;
 	}
 }
