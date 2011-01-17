@@ -5,9 +5,20 @@ bool Game::Done = false;
 double fps = 0;
 double tdelta = 0;
 double delta = 0;
-uint64_t ticks = 0;
+uint64_t ticks = 10;
+uint16_t Game::Range = 10;
 
 bool Game::Init() {
+	//Load settings
+	po::options_description desc("Allowed options");
+	desc.add_options()
+    ("range", po::value<uint16_t>(&Range)->default_value(10), "Change view range")
+    ("genspeed", po::value<uint16_t>(&GenSpeed)->default_value(10), "Change generation speed");
+	po::variables_map vm;
+	po::store(po::parse_config_file<char>("config.ini", desc, false), vm);
+	po::notify(vm);
+	cout << "View Range is " << Range << endl;
+	cout << "Chunk Generation Speed is " << GenSpeed << endl;
 	InitBlocks();
 	InitGen();
 	Window.Create(sf::VideoMode(800,600,32),"Infinity Cubed",sf::Style::Close|sf::Style::Titlebar,sf::ContextSettings(24,0,0,3,3));
@@ -56,17 +67,12 @@ bool Game::Loop() {
 	//SkyDraw();
 	glClear(GL_DEPTH_BUFFER_BIT);
 	//Draw everything
-#ifdef _DEBUG
-	uint8_t range = 8;
-#else
-	uint8_t range = 12;
-#endif
 	if(ticks%30==0){//Every so often run through and clean up the chunk list
 		Chunks.clear();
-		for(uint8_t a=0;a<=range*2;a++){
-			for(uint8_t b=0;b<=range*2;b++){
-				for(uint8_t c=0;c<=range*2;c++){
-					GetChunk(player.pos.cx+a-range,player.pos.cy+b-range,player.pos.cz+c-range,true);
+		for(uint8_t a=0;a<=Range*2;a++){
+			for(uint8_t b=0;b<=Range*2;b++){
+				for(uint8_t c=0;c<=Range*2;c++){
+					GetChunk(player.pos.cx+a-Range,player.pos.cy+b-Range,player.pos.cz+c-Range,true);
 				}
 			}
 		}
@@ -76,11 +82,11 @@ bool Game::Loop() {
 					Chunk* c=z->second;
 					if(c!=0){
 						double d = pdis(player.pos.cx,player.pos.cy,player.pos.cz,c->x,c->y,c->z);
-						if(d<range){
+						if(d<Range){
 							if(c->verts>0){
 								Chunks.insert(c);
 							}
-						} else if(d>range*2){
+						} else if(d>Range*2){
 							AddChunkUnload(c);
 						}
 					}
@@ -90,7 +96,7 @@ bool Game::Loop() {
 		sort(ChunksToGen.begin(),ChunksToGen.end(),ChunkComp);
 		while(!ChunksToGen.empty()){
 			Chunk* c = ChunksToGen.back();
-			if(pdis(player.pos.cx,player.pos.cy,player.pos.cz,c->x,c->y,c->z)>range*1.5){
+			if(pdis(player.pos.cx,player.pos.cy,player.pos.cz,c->x,c->y,c->z)>Range*1.5){
 				ChunksToGen.pop_back();
 			} else {
 				break;

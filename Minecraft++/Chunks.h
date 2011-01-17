@@ -18,6 +18,7 @@ Chunk* GetChunk(uint64_t x, uint64_t y, uint64_t z, bool generate = true);
 extern set<Chunk*> Chunks;
 extern map<uint64_t,map<uint64_t,map<uint64_t,Chunk*>>> ChunkPos;
 
+extern uint16_t GenSpeed;
 void InitGen();
 void UpdateChunks();
 void GenChunks();

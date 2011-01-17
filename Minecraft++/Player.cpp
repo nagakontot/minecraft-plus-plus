@@ -109,8 +109,7 @@ void Player::Step() {
 		vx *= d;
 		vy *= d;
 	}
-	//if(input.IsKeyDown(sf::Key::Space) && onground){
-	if(onground){
+	if(input.IsKeyDown(sf::Key::Space) && onground){
 		vz = -jump;
 	}
 	Chunk* ch = GetChunk(pos.cx,pos.cy,pos.cz);
