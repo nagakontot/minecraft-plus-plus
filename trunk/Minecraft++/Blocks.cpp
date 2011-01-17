@@ -118,6 +118,7 @@ void InitBlocks() {
 						if(b!=0){\
 							b->extra = 0;\
 							AddChunkUpdate(c);\
+							c->modified = true;\
 						}
 void AddBlockUpdate(int8_t x, int8_t y, int8_t z, Chunk* chunk) {
 	Block* b;

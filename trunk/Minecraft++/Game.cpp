@@ -9,6 +9,9 @@ uint64_t ticks = 10;
 uint16_t Game::Range = 10;
 
 bool Game::Init() {
+	if(!bf::exists("save")){
+		bf::create_directory("save");
+	}
 	//Load settings
 	po::options_description desc("Allowed options");
 	desc.add_options()

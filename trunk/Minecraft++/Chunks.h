@@ -6,6 +6,7 @@ struct Chunk {
 	uint16_t verts;
 	bool generated;
 	bool updated;
+	bool modified;
 	Chunk(uint64_t x, uint64_t y, uint64_t z);
 	~Chunk();
 	const void Draw();
