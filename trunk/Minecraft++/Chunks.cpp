@@ -5,6 +5,8 @@ noise::module::RidgedMulti genmtns;
 noise::module::Perlin gentype;
 noise::module::Billow gencaves;
 
+uint16_t GenSpeed;
+
 void InitGen() {
 	genhills.SetFrequency(1.0/1024);
 	genhills.SetLacunarity(2);
@@ -407,7 +409,7 @@ bool ChunkComp(Chunk* a, Chunk* b){
 	return da<db;
 }
 void GenChunks() {
-	for(int f=0;f<10 && !ChunksToGen.empty(); f++){
+	for(int f=0;f<GenSpeed && !ChunksToGen.empty(); f++){
 		Chunk* c = ChunksToGen.front();
 		ChunksToGen.pop_front();
 		c->Generate();
