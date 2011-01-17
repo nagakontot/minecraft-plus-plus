@@ -26,7 +26,7 @@ void InitGen() {
 	gencaves.SetFrequency(1.0/100);
 	gencaves.SetLacunarity(2);
 	gencaves.SetNoiseQuality(noise::QUALITY_FAST);
-	gencaves.SetOctaveCount(4);
+	gencaves.SetOctaveCount(3);
 	gencaves.SetPersistence(0.5);
 }
 
@@ -318,66 +318,64 @@ void Chunk::AddUpdate(uint8_t x1, uint8_t y1, uint8_t z1, uint8_t x2, uint8_t y2
 }
 
 const void Chunk::Draw() {
-	if(generated && updated && verts>0){
-		//View culling. Thereby speeding up the rendering, suppose the culling itself isn't too intensive
-		//This needs a lot of work.
-		/*double vfov = 60*degtorad;
-		double wfov = atan(tan(vfov)*Window.GetWidth()/Window.GetHeight());
-		double diag = sqrt(sqr(tan(vfov))+sqr(tan(wfov)));
-		double dfov = atan(diag);
-		double px, py, pz;
-		if(x>player.pos.cx){
-			px = x-player.pos.cx;
-		} else {
-			px = player.pos.cx-x;
-			px = -px;
-		}
-		px -= player.pos.x/16-0.5;
-		if(y>player.pos.cy){
-			py = y-player.pos.cy;
-		} else {
-			py = player.pos.cy-y;
-			py = -py;
-		}
-		py -= player.pos.y/16-0.5;
-		if(z>player.pos.cz){
-			pz = z-player.pos.cz;
-		} else {
-			pz = player.pos.cz-z;
-			pz = -pz;
-		}
-		pz -= player.pos.z/16-0.5;
-		double dis = sqrt(sqr(px)+sqr(py)+sqr(pz));
-		double ad = 2*acos(sqrt(3.0)/2/dis);
-		double da = acos((ldx(1,player.rot.d)*ldx(1,player.rot.p)*px+ldy(1,player.rot.d)*ldx(1,player.rot.p)*py+ldy(1,player.rot.p)*pz)/dis);
-		if(dis<2 || da<dfov+ad){*/
-			glLoadIdentity();
-			double dx, dy, dz;
-			if(player.pos.cx>x){
-				dx = player.pos.cx-x;
-			} else {
-				dx = x-player.pos.cx;
-				dx = -dx;
-			}
-			if(player.pos.cy>y){
-				dy = player.pos.cy-y;
-			} else {
-				dy = y-player.pos.cy;
-				dy = -dy;
-			}
-			if(player.pos.cz>z){
-				dz = player.pos.cz-z;
-			} else {
-				dz = z-player.pos.cz;
-				dz = -dz;
-			}
-			glTranslated(-16*dx, -16*dy, -16*dz);
-			glBindBuffer(GL_ARRAY_BUFFER,vbo);
-			glVertexPointer(3,GL_FLOAT,0,0);
-			glTexCoordPointer(3,GL_FLOAT,0,(char*)NULL+verts*3*sizeof(GLfloat));
-			glDrawArrays(GL_QUADS,0,verts);
-		//}
+	//View culling. Thereby speeding up the rendering, suppose the culling itself isn't too intensive
+	//This needs a lot of work.
+	/*double vfov = 60*degtorad;
+	double wfov = atan(tan(vfov)*Window.GetWidth()/Window.GetHeight());
+	double diag = sqrt(sqr(tan(vfov))+sqr(tan(wfov)));
+	double dfov = atan(diag);
+	double px, py, pz;
+	if(x>player.pos.cx){
+		px = x-player.pos.cx;
+	} else {
+		px = player.pos.cx-x;
+		px = -px;
 	}
+	px -= player.pos.x/16-0.5;
+	if(y>player.pos.cy){
+		py = y-player.pos.cy;
+	} else {
+		py = player.pos.cy-y;
+		py = -py;
+	}
+	py -= player.pos.y/16-0.5;
+	if(z>player.pos.cz){
+		pz = z-player.pos.cz;
+	} else {
+		pz = player.pos.cz-z;
+		pz = -pz;
+	}
+	pz -= player.pos.z/16-0.5;
+	double dis = sqrt(sqr(px)+sqr(py)+sqr(pz));
+	double ad = 2*acos(sqrt(3.0)/2/dis);
+	double da = acos((ldx(1,player.rot.d)*ldx(1,player.rot.p)*px+ldy(1,player.rot.d)*ldx(1,player.rot.p)*py+ldy(1,player.rot.p)*pz)/dis);
+	if(dis<2 || da<dfov+ad){*/
+		glLoadIdentity();
+		double dx, dy, dz;
+		if(player.pos.cx>x){
+			dx = player.pos.cx-x;
+		} else {
+			dx = x-player.pos.cx;
+			dx = -dx;
+		}
+		if(player.pos.cy>y){
+			dy = player.pos.cy-y;
+		} else {
+			dy = y-player.pos.cy;
+			dy = -dy;
+		}
+		if(player.pos.cz>z){
+			dz = player.pos.cz-z;
+		} else {
+			dz = z-player.pos.cz;
+			dz = -dz;
+		}
+		glTranslated(-16*dx, -16*dy, -16*dz);
+		glBindBuffer(GL_ARRAY_BUFFER,vbo);
+		glVertexPointer(3,GL_FLOAT,0,0);
+		glTexCoordPointer(3,GL_FLOAT,0,(char*)NULL+verts*3*sizeof(GLfloat));
+		glDrawArrays(GL_QUADS,0,verts);
+	//}
 }
 
 Chunk* GetChunk(uint64_t x, uint64_t y, uint64_t z, bool generate) {
