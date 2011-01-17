@@ -447,7 +447,12 @@ void GenChunks() {
 	for(int f=0;f<GenSpeed && !ChunksToGen.empty(); f++){
 		Chunk* c = ChunksToGen.front();
 		ChunksToGen.pop_front();
-		c->Generate();
+		ifstream file("save/"+tostring(c->x)+"/"+tostring(c->y)+"/"+tostring(c->z)+".imd", ios_base::binary);
+		if(file.is_open()){
+			cout << "Loading chunk" << endl;
+		} else {
+			c->Generate();
+		}
 		AddChunkUpdate(c);
 	}
 }
