@@ -7,6 +7,7 @@ struct Chunk {
 	bool generated;
 	bool updated;
 	Chunk(uint64_t x, uint64_t y, uint64_t z);
+	~Chunk();
 	const void Draw();
 	void Update();
 	void Generate();

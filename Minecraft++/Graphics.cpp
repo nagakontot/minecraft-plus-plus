@@ -2,7 +2,13 @@
 
 sf::Window Window;
 GLuint TEX;
-#define AddTex(x, y) glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, x, TEXTURE_SIZE, TEXTURE_SIZE, 1, GL_RGBA, GL_UNSIGNED_BYTE, GetPixels(y));
+
+void AddTex(GLuint z, string name) {
+	sf::Image* image = new sf::Image;
+	image->LoadFromFile(name);
+	glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, z, TEXTURE_SIZE, TEXTURE_SIZE, 1, GL_RGBA, GL_UNSIGNED_BYTE, image->GetPixelsPtr());
+	delete image;
+}
 
 void InitGraphics() {
 	glewInit();
@@ -56,13 +62,9 @@ GLuint GetTexture(string name) {
 	}
 	GLint t[1];
 	glGetIntegerv(GL_TEXTURE_BINDING_2D,t);
+	glBindTexture(GL_TEXTURE_2D,0);
 	return *t;
 }
-uint8_t* GetPixels(string name) {
-	sf::Image* image = new sf::Image;
-	image->LoadFromFile(name);
-	return (uint8_t*)image->GetPixelsPtr();
-};
 
 void BindTexture(GLuint tex) {
 	if(tex!=bound){

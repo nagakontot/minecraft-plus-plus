@@ -1,16 +1,27 @@
 #pragma once
 
-//SFML
-#include <GL/glew.h>
-#include <SFML/Graphics.hpp>
-#include <SFML/Network.hpp>
-#include <SFML/Audio.hpp>
-
 //Boost
 #include <boost/filesystem.hpp>
 #include <boost/thread.hpp>
 #include <boost/program_options.hpp>
 namespace po = boost::program_options;
+
+////Memory Leaks
+//#define _CRTDBG_MAP_ALLOC
+//#include <stdlib.h>
+//#include <crtdbg.h>
+//#ifdef _DEBUG
+//   #ifndef DBG_NEW
+//      #define DBG_NEW new ( _NORMAL_BLOCK , __FILE__ , __LINE__ )
+//      #define new DBG_NEW
+//   #endif
+//#endif  // _DEBUG
+
+//SFML
+#include <GL/glew.h>
+#include <SFML/Graphics.hpp>
+#include <SFML/Network.hpp>
+#include <SFML/Audio.hpp>
 
 //And other stuff too
 #include <noise/noise.h>
