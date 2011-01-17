@@ -324,7 +324,7 @@ void Player::EditBlocks(int button) {
 			nx = floor(ox)+1;
 			dx = (nx-ox)/rx*tdis;
 		} else if(rx<0){
-			nx = floor(ox)-1;
+			nx = floor(ox-0.0001)-1;
 			dx = ((nx+1)-ox)/rx*tdis;
 		} else {
 			dx = 0;
@@ -333,7 +333,7 @@ void Player::EditBlocks(int button) {
 			ny = floor(oy)+1;
 			dy = (ny-oy)/ry*tdis;
 		} else if(ry<0){
-			ny = floor(oy)-1;
+			ny = floor(oy-0.0001)-1;
 			dy = ((ny+1)-oy)/ry*tdis;
 		} else {
 			dy = 0;
@@ -342,7 +342,7 @@ void Player::EditBlocks(int button) {
 			nz = floor(oz)+1;
 			dz = (nz-oz)/rz*tdis;
 		} else if(rz<0){
-			nz = floor(oz)-1;
+			nz = floor(oz-0.0001)-1;
 			dz = ((nz+1)-oz)/rz*tdis;
 		} else {
 			dz = 0;
@@ -372,7 +372,7 @@ void Player::EditBlocks(int button) {
 		while(!choices.empty()){
 			c = choices.top();
 			choices.pop();
-			if(c.value>0.0001 && c.value<dis){
+			if(c.value>0.00001 && c.value<dis){
 				done = true;
 				break;
 			}
@@ -384,9 +384,12 @@ void Player::EditBlocks(int button) {
 		ox += rx/tdis*c.value;
 		oy += ry/tdis*c.value;
 		oz += rz/tdis*c.value;
+		int8_t cx = floor(ox);
+		int8_t cy = floor(oy);
+		int8_t cz = floor(oz);
 		Chunk* Ch = ch;
 		if(c.type=="x"){
-			Block* b = GetBlock(nx,oy,oz,Ch);
+			Block* b = GetBlock(nx,cy,cz,Ch);
 			if(b==0){
 				return;
 			}
@@ -394,8 +397,8 @@ void Player::EditBlocks(int button) {
 			if(t.mineable){
 				bo = b;
 				bx = nx;
-				by = oy;
-				bz = oz;
+				by = cy;
+				bz = cz;
 				if(rx>0){
 					bd = "xn";
 				} else {
@@ -404,16 +407,16 @@ void Player::EditBlocks(int button) {
 			}
 		}
 		if(c.type=="y"){
-			Block* b = GetBlock(ox,ny,oz,Ch);
+			Block* b = GetBlock(cx,ny,cz,Ch);
 			if(b==0){
 				return;
 			}
 			BlockType t = BlockTypes[b->type];
 			if(t.mineable){
 				bo = b;
-				bx = ox;
+				bx = cx;
 				by = ny;
-				bz = oz;
+				bz = cz;
 				if(ry>0){
 					bd = "yn";
 				} else {
@@ -422,15 +425,15 @@ void Player::EditBlocks(int button) {
 			}
 		}
 		if(c.type=="z"){
-			Block* b = GetBlock(ox,oy,nz,Ch);
+			Block* b = GetBlock(cx,cy,nz,Ch);
 			if(b==0){
 				return;
 			}
 			BlockType t = BlockTypes[b->type];
 			if(t.mineable){
 				bo = b;
-				bx = ox;
-				by = oy;
+				bx = cx;
+				by = cy;
 				bz = nz;
 				if(rz>0){
 					bd = "zn";
