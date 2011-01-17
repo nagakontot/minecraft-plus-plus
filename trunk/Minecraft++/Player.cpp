@@ -272,7 +272,11 @@ void Player::Step() {
 								onground = true;
 								pos.z = nz-0.0001;
 							}
-							if(rz<0 && !flying){
+							if(rz<0){
+								if(flying){
+									finished = true;
+									goto done;
+								}
 								vz = 0;
 								pos.z = nz+1.0001+height;
 							}

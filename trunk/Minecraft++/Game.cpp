@@ -103,14 +103,6 @@ bool Game::Loop() {
 			}
 		}
 		sort(ChunksToGen.begin(),ChunksToGen.end(),ChunkComp);
-		while(!ChunksToGen.empty()){
-			Chunk* c = ChunksToGen.back();
-			if(pdis(player.pos.cx,player.pos.cy,player.pos.cz,c->x,c->y,c->z)>Range*1.5){
-				ChunksToGen.pop_back();
-			} else {
-				break;
-			}
-		}
 	}
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -138,5 +130,16 @@ bool Game::Loop() {
 	return Window.IsOpened();
 }
 void Game::Unload() {
+	for(auto x=ChunkPos.begin();x!=ChunkPos.end();x++){
+		for(auto y=x->second.begin();y!=x->second.end();y++){
+			for(auto z=y->second.begin();z!=y->second.end();z++){
+				Chunk* c=z->second;
+				if(c!=0){
+					AddChunkUnload(c);
+				}
+			}
+		}
+	}
+	UnloadChunks();
 	Done = true;
 }

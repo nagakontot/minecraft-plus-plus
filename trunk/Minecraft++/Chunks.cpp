@@ -52,6 +52,41 @@ Chunk::Chunk(uint64_t _x, uint64_t _y, uint64_t _z) {
 	AddChunkUpdate(this);
 }
 
+Chunk::~Chunk() {
+	auto it2 = find(ChunksToGen.begin(),ChunksToGen.end(),this);
+	if(it2!=ChunksToGen.end()){
+		ChunksToGen.erase(it2);
+	}
+	auto it3 = find(ChunksToUpdate.begin(),ChunksToUpdate.end(),this);
+	if(it3!=ChunksToUpdate.end()){
+		ChunksToUpdate.erase(it3);
+	}
+	auto it4 = find(Chunks.begin(),Chunks.end(),this);
+	if(it4!=Chunks.end()){
+		Chunks.erase(it4);
+	}
+	ChunkPos[x][y][z] = 0;
+	if(xp!=0){
+		xp->xn = 0;
+	}
+	if(xn!=0){
+		xn->xp = 0;
+	}
+	if(yp!=0){
+		yp->yn = 0;
+	}
+	if(yn!=0){
+		yn->yp = 0;
+	}
+	if(zp!=0){
+		zp->zn = 0;
+	}
+	if(zn!=0){
+		zn->zp = 0;
+	}
+	glDeleteBuffers(1,&vbo);
+}
+
 void Chunk::Generate() {
 	//Map generation goes here =D
 	for(uint8_t a=0;a<16;a++){
@@ -422,38 +457,6 @@ void UnloadChunks() {
 		auto it = ChunksToUnload.begin();
 		Chunk* c = *it;
 		ChunksToUnload.erase(it);
-		auto it2 = find(ChunksToGen.begin(),ChunksToGen.end(),c);
-		if(it2!=ChunksToGen.end()){
-			ChunksToGen.erase(it2);
-		}
-		auto it3 = find(ChunksToUpdate.begin(),ChunksToUpdate.end(),c);
-		if(it3!=ChunksToUpdate.end()){
-			ChunksToUpdate.erase(it3);
-		}
-		auto it4 = find(Chunks.begin(),Chunks.end(),c);
-		if(it4!=Chunks.end()){
-			Chunks.erase(it4);
-		}
-		ChunkPos[c->x][c->y][c->z] = 0;
-		if(c->xp!=0){
-			c->xp->xn = 0;
-		}
-		if(c->xn!=0){
-			c->xn->xp = 0;
-		}
-		if(c->yp!=0){
-			c->yp->yn = 0;
-		}
-		if(c->yn!=0){
-			c->yn->yp = 0;
-		}
-		if(c->zp!=0){
-			c->zp->zn = 0;
-		}
-		if(c->zn!=0){
-			c->zn->zp = 0;
-		}
-		glDeleteBuffers(1,&c->vbo);
 		delete c;
 	}
 }
