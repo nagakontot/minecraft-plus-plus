@@ -35,6 +35,7 @@ void InitGen() {
 Chunk::Chunk(uint64_t _x, uint64_t _y, uint64_t _z) {
 	generated = false;
 	updated = false;
+	modified = false;
 	x = _x;
 	y = _y;
 	z = _z;
@@ -85,52 +86,63 @@ Chunk::~Chunk() {
 		zn->zp = 0;
 	}
 	glDeleteBuffers(1,&vbo);
+	if(modified){
+		ofstream file("save/"+tostring(x)+"."+tostring(y)+"."+tostring(z)+".imd", ios_base::binary);
+		file.write((char*)Blocks,32768);
+		file.close();
+	}
 }
 
 void Chunk::Generate() {
 	//Map generation goes here =D
-	for(uint8_t a=0;a<16;a++){
-		double cx;
-		if(x/0x10000000%2==1){
-				cx = ((x&0xfffffff)<<4)+a;
-			} else {
-				cx = 0x100000000-(((x&0xfffffff)<<4)+a);
-			}
-		for(uint8_t b=0;b<16;b++){
-			double cy;
-			if(y/0x10000000%2==1){
-				cy = ((y&0xfffffff)<<4)+b;
-			} else {
-				cy = 0x100000000-(((y&0xfffffff)<<4)+b);
-			}
-			double hh = genhills.GetValue(cx,cy,0);
-			double hm = genmtns.GetValue(cx,cy,0);
-			double sel = gentype.GetValue(cx,cy,0);
-			int64_t r = max(0.0,sel)*hm*0x200+(1-abs(sel))*hh*0x80;
-			int64_t rz;
-			if(z>=INT64_MAX){
-				rz = z-INT64_MAX;
-			} else {
-				rz = -(INT64_MAX-z);
-			}
-			for(uint8_t c=0;c<16;c++){
-				double cz;
-				if(z/0x10000000%2==1){
-					cz = ((z&0xfffffff)<<4)+c;
+	ifstream file("save/"+tostring(x)+"."+tostring(y)+"."+tostring(z)+".imd", ios_base::binary);
+	if(file.is_open()){
+		file.read((char*)Blocks,32768);
+		file.close();
+	} else {
+		for(uint8_t a=0;a<16;a++){
+			double cx;
+			if(x/0x10000000%2==1){
+					cx = ((x&0xfffffff)<<4)+a;
 				} else {
-					cz = 0x100000000-(((z&0xfffffff)<<4)+c);
+					cx = 0x100000000-(((x&0xfffffff)<<4)+a);
 				}
-				int64_t bz = rz*16+c;
-				int64_t d = bz-r;
-				uint16_t i = a*256+b*16+c;
-				if(d<0 || gencaves.GetValue(cx,cy,cz)+1<0){
-					Blocks[i].type = 0;
-				} else if(d>4){
-					Blocks[i].type = 2;
-				} else if(d>0){
-					Blocks[i].type = 1;
+			for(uint8_t b=0;b<16;b++){
+				double cy;
+				if(y/0x10000000%2==1){
+					cy = ((y&0xfffffff)<<4)+b;
 				} else {
-					Blocks[i].type = 3;
+					cy = 0x100000000-(((y&0xfffffff)<<4)+b);
+				}
+				double hh = genhills.GetValue(cx,cy,0);
+				double hm = genmtns.GetValue(cx,cy,0);
+				double sel = gentype.GetValue(cx,cy,0);
+				int64_t r = max(0.0,sel)*hm*0x200+(1-abs(sel))*hh*0x80;
+				int64_t rz;
+				if(z>=INT64_MAX){
+					rz = z-INT64_MAX;
+				} else {
+					rz = -(INT64_MAX-z);
+				}
+				for(uint8_t c=0;c<16;c++){
+					double cz;
+					if(z/0x10000000%2==1){
+						cz = ((z&0xfffffff)<<4)+c;
+					} else {
+						cz = 0x100000000-(((z&0xfffffff)<<4)+c);
+					}
+					int64_t bz = rz*16+c;
+					int64_t d = bz-r;
+					uint16_t i = a*256+b*16+c;
+					if(d<0 || gencaves.GetValue(cx,cy,cz)+1<0){
+						Blocks[i].type = 0;
+					} else if(d>4){
+						Blocks[i].type = 2;
+					} else if(d>0){
+						Blocks[i].type = 1;
+					} else {
+						Blocks[i].type = 3;
+					}
 				}
 			}
 		}
@@ -447,12 +459,7 @@ void GenChunks() {
 	for(int f=0;f<GenSpeed && !ChunksToGen.empty(); f++){
 		Chunk* c = ChunksToGen.front();
 		ChunksToGen.pop_front();
-		ifstream file("save/"+tostring(c->x)+"/"+tostring(c->y)+"/"+tostring(c->z)+".imd", ios_base::binary);
-		if(file.is_open()){
-			cout << "Loading chunk" << endl;
-		} else {
-			c->Generate();
-		}
+		c->Generate();
 		AddChunkUpdate(c);
 	}
 }

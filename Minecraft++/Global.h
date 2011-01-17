@@ -5,6 +5,7 @@
 #include <boost/thread.hpp>
 #include <boost/program_options.hpp>
 namespace po = boost::program_options;
+namespace bf = boost::filesystem;
 
 ////Memory Leaks
 //#define _CRTDBG_MAP_ALLOC
