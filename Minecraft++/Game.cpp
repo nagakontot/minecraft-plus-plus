@@ -77,7 +77,9 @@ bool Game::Loop() {
 					if(c!=0){
 						double d = pdis(player.pos.cx,player.pos.cy,player.pos.cz,c->x,c->y,c->z);
 						if(d<range){
-							Chunks.insert(c);
+							if(c->verts>0){
+								Chunks.insert(c);
+							}
 						} else if(d>range*2){
 							AddChunkUnload(c);
 						}
