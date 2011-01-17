@@ -15,4 +15,5 @@ public:
 	bool safespot;
 	Player();
 	void Step();
+	void EditBlocks(int button);
 } extern player;

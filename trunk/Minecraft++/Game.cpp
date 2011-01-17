@@ -32,6 +32,7 @@ bool Game::Init() {
 bool Game::Loop() {
 	//Event handling
 	sf::Event e;
+	int mbut = 0;
 	while(Window.GetEvent(e)){
 		switch(e.Type){
 		case sf::Event::Closed:
@@ -48,6 +49,14 @@ bool Game::Loop() {
 			break;
 		case sf::Event::LostFocus:
 			Active = false;
+			break;
+		case sf::Event::MouseButtonPressed:
+			if(e.MouseButton.Button==sf::Mouse::Left){
+				mbut = 1;
+			}
+			if(e.MouseButton.Button==sf::Mouse::Right){
+				mbut = 2;
+			}
 			break;
 		}
 	}
@@ -109,9 +118,13 @@ bool Game::Loop() {
 	for(auto i=Chunks.begin(); i!=Chunks.end(); i++){
 		(*i)->Draw();
 	}
+	glBindTexture(GL_TEXTURE_3D,0);
 	glBindBuffer(GL_ARRAY_BUFFER,0);
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	glDisable(GL_DEPTH_TEST);
+	player.EditBlocks(mbut);
+	glEnable(GL_DEPTH_TEST);
 	//Display the screen
 	Window.Display();
 	fps = fps*0.8+0.2/Window.GetFrameTime();

@@ -298,3 +298,205 @@ void Player::Step() {
 	}
 	pos.Update();
 }
+
+void Player::EditBlocks(int button) {
+	Block* bo = 0;
+	int8_t bx, by, bz;
+	string bd = "";
+	double tdis = 10;//Maximum block distance
+	double dis = tdis;
+	double rx = ldx(1,player.rot.d)*ldx(1,player.rot.p)*tdis;
+	double ry = ldy(1,player.rot.d)*ldx(1,player.rot.p)*tdis;
+	double rz = ldy(1,player.rot.p)*tdis;
+	double ox = pos.x;
+	double oy = pos.y;
+	double oz = pos.z-eyeh;
+	Chunk* ch = GetChunk(pos.cx,pos.cy,pos.cz);
+	while(dis>0){
+		bool finished = false;
+		double nx, ny, nz;
+		double dx, dy, dz;
+		if(rx>0){
+			nx = floor(ox)+1;
+			dx = (nx-ox)/rx*tdis;
+		} else if(rx<0){
+			nx = floor(ox)-1;
+			dx = ((nx+1)-ox)/rx*tdis;
+		} else {
+			dx = 0;
+		}
+		if(ry>0){
+			ny = floor(oy)+1;
+			dy = (ny-oy)/ry*tdis;
+		} else if(ry<0){
+			ny = floor(oy)-1;
+			dy = ((ny+1)-oy)/ry*tdis;
+		} else {
+			dy = 0;
+		}
+		if(rz>0){
+			nz = floor(oz)+1;
+			dz = (nz-oz)/rz*tdis;
+		} else if(rz<0){
+			nz = floor(oz)-1;
+			dz = ((nz+1)-oz)/rz*tdis;
+		} else {
+			dz = 0;
+		}
+		struct choice {
+			string type;
+			double value;
+			choice() {
+				type = "";
+				value = 0;
+			}
+			choice(string t, double v) {
+				type = t;
+				value = v;
+			}
+			bool operator() (const choice a, const choice b) {
+				return a.value>b.value;
+			}
+		};
+		priority_queue<choice,vector<choice>,choice> choices;
+		choices.push(choice("x",dx));
+		choices.push(choice("y",dy));
+		choices.push(choice("z",dz));
+
+		choice c;
+		bool done = false;
+		while(!choices.empty()){
+			c = choices.top();
+			choices.pop();
+			if(c.value>0.0001 && c.value<dis){
+				done = true;
+				break;
+			}
+		}
+		if(!done){
+			break;
+		}
+		double ndis = dis-c.value;
+		ox += rx/tdis*c.value;
+		oy += ry/tdis*c.value;
+		oz += rz/tdis*c.value;
+		Chunk* Ch = ch;
+		if(c.type=="x"){
+			Block* b = GetBlock(nx,oy,oz,Ch);
+			if(b==0){
+				return;
+			}
+			BlockType t = BlockTypes[b->type];
+			if(t.mineable){
+				bo = b;
+				bx = nx;
+				by = oy;
+				bz = oz;
+				if(rx>0){
+					bd = "xn";
+				} else {
+					bd = "xp";
+				}
+			}
+		}
+		if(c.type=="y"){
+			Block* b = GetBlock(ox,ny,oz,Ch);
+			if(b==0){
+				return;
+			}
+			BlockType t = BlockTypes[b->type];
+			if(t.mineable){
+				bo = b;
+				bx = ox;
+				by = ny;
+				bz = oz;
+				if(ry>0){
+					bd = "yn";
+				} else {
+					bd = "yp";
+				}
+			}
+		}
+		if(c.type=="z"){
+			Block* b = GetBlock(ox,oy,nz,Ch);
+			if(b==0){
+				return;
+			}
+			BlockType t = BlockTypes[b->type];
+			if(t.mineable){
+				bo = b;
+				bx = ox;
+				by = oy;
+				bz = nz;
+				if(rz>0){
+					bd = "zn";
+				} else {
+					bd = "zp";
+				}
+			}
+		}
+		dis = ndis;
+		if(bo){
+			glLoadIdentity();
+			glTranslated(bx,by,bz);
+			glBegin(GL_LINES);
+			glVertex3f(0,0,0);
+			glVertex3f(1,0,0);
+			glVertex3f(0,0,0);
+			glVertex3f(0,1,0);
+			glVertex3f(0,0,0);
+			glVertex3f(0,0,1);
+			glVertex3f(1,0,0);
+			glVertex3f(1,1,0);
+			glVertex3f(1,0,0);
+			glVertex3f(1,0,1);
+			glVertex3f(0,1,0);
+			glVertex3f(1,1,0);
+			glVertex3f(0,1,0);
+			glVertex3f(0,1,1);
+			glVertex3f(0,0,1);
+			glVertex3f(1,0,1);
+			glVertex3f(0,0,1);
+			glVertex3f(0,1,1);
+			glVertex3f(1,1,0);
+			glVertex3f(1,1,1);
+			glVertex3f(1,0,1);
+			glVertex3f(1,1,1);
+			glVertex3f(0,1,1);
+			glVertex3f(1,1,1);
+			glEnd();
+			if(button==1){
+				bo->type = 0;
+				AddBlockUpdate(bx,by,bz,ch);
+			}
+			if(button==2){
+				if(bd=="xp"){
+					GetBlock(bx+1,by,bz,ch)->type = 4;
+					AddBlockUpdate(bx+1,by,bz,ch);
+				}
+				if(bd=="xn"){
+					GetBlock(bx-1,by,bz,ch)->type = 4;
+					AddBlockUpdate(bx-1,by,bz,ch);
+				}
+				if(bd=="yp"){
+					GetBlock(bx,by+1,bz,ch)->type = 4;
+					AddBlockUpdate(bx,by+1,bz,ch);
+				}
+				if(bd=="yn"){
+					GetBlock(bx,by-1,bz,ch)->type = 4;
+					AddBlockUpdate(bx,by-1,bz,ch);
+				}
+				if(bd=="zp"){
+					GetBlock(bx,by,bz+1,ch)->type = 4;
+					AddBlockUpdate(bx,by,bz+1,ch);
+				}
+				if(bd=="zn"){
+					GetBlock(bx,by,bz-1,ch)->type = 4;
+					AddBlockUpdate(bx,by,bz-1,ch);
+				}
+			}
+			break;
+		}
+	}
+	//Handle stuff
+}
