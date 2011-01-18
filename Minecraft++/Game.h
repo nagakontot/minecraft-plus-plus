@@ -1,4 +1,5 @@
 extern double delta;
+extern uint64_t ticks;
 
 namespace Game {
 	bool Init();
