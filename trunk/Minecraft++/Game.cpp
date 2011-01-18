@@ -46,6 +46,12 @@ bool Game::Loop() {
 			case sf::Key::Escape:
 				Window.Close();
 				break;
+			case sf::Key::Equal:
+				Range++;
+				break;
+			case sf::Key::Subtract:
+				Range--;
+				break;
 			}
 		case sf::Event::GainedFocus:
 			Active = true;
@@ -54,12 +60,17 @@ bool Game::Loop() {
 			Active = false;
 			break;
 		case sf::Event::MouseButtonPressed:
-			if(e.MouseButton.Button==sf::Mouse::Left){
+			switch(e.MouseButton.Button){
+			case sf::Mouse::Left:
 				mbut = 1;
-			}
-			if(e.MouseButton.Button==sf::Mouse::Right){
+				break;
+			case sf::Mouse::Right:
 				mbut = 2;
+				break;
 			}
+			break;
+		case sf::Event::MouseWheelMoved:
+			//Inventory.Selected += e.MouseWheel.Delta;
 			break;
 		}
 	}
@@ -119,6 +130,18 @@ bool Game::Loop() {
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	glDisable(GL_DEPTH_TEST);
 	player.EditBlocks(mbut);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(0,1,1,0,-1,1);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	//Draw the interface
+	glBegin(GL_LINES);
+	glVertex2f(0.49,0.5);
+	glVertex2f(0.51,0.5);
+	glVertex2f(0.5,0.49);
+	glVertex2f(0.5,0.51);
+	glEnd();
 	glEnable(GL_DEPTH_TEST);
 	//Display the screen
 	Window.Display();
