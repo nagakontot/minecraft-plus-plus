@@ -43,9 +43,11 @@ using namespace std;
 
 //Our own headers
 #include "Utilities.h"
+#include "Network.h"
 #include "Position.h"
 #include "Rotation.h"
 #include "Graphics.h"
+#include "Inventory.h"
 #include "Sky.h"
 #include "Models.h"
 #include "Blocks.h"

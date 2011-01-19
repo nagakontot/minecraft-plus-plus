@@ -7,6 +7,7 @@ double tdelta = 0;
 double delta = 0;
 uint64_t ticks = 10;
 uint16_t Game::Range = 10;
+bool Game::Online = false;
 
 bool Game::Init() {
 	if(!bf::exists("save")){
@@ -16,6 +17,7 @@ bool Game::Init() {
 	po::options_description desc("Allowed options");
 	desc.add_options()
     ("range", po::value<uint16_t>(&Range)->default_value(10), "Change view range")
+	("online", po::value<bool>(&Online)->default_value(false), "Change whether the game is online or not")
     ("genspeed", po::value<uint16_t>(&GenSpeed)->default_value(10), "Change generation speed");
 	po::variables_map vm;
 	po::store(po::parse_config_file<char>("config.ini", desc, false), vm);
@@ -24,6 +26,7 @@ bool Game::Init() {
 	cout << "Chunk Generation Speed is " << GenSpeed << endl;
 	InitBlocks();
 	InitGen();
+	SkyInit();
 	Window.Create(sf::VideoMode(800,600,32),"Infinity Cubed",sf::Style::Close|sf::Style::Titlebar,sf::ContextSettings(24,0,0,3,3));
 	Window.ShowMouseCursor(false);
 	//Window.SetFramerateLimit(30);
@@ -70,7 +73,7 @@ bool Game::Loop() {
 			}
 			break;
 		case sf::Event::MouseWheelMoved:
-			//Inventory.Selected += e.MouseWheel.Delta;
+			Inv.Selected = ((Inv.Selected-1+e.MouseWheel.Delta)%Inv.Total+Inv.Total)%Inv.Total+1;
 			break;
 		}
 	}
@@ -79,16 +82,19 @@ bool Game::Loop() {
 	GenChunks();
 	UpdateChunks();
 	UnloadChunks();
+	//Clear the screen
+	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_DEPTH_BUFFER_BIT);
+	//Projection
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	gluPerspective(60,(double)Window.GetWidth()/Window.GetHeight(),0.01,1000);
 	gluLookAt(0,0,0,ldx(1,player.rot.d)*ldx(1,player.rot.p),ldy(1,player.rot.d)*ldx(1,player.rot.p),ldy(1,player.rot.p),0,0,-1);
+	glMatrixMode(GL_MODELVIEW);
+	SkyDraw();
+	glMatrixMode(GL_PROJECTION);
 	glTranslated(-player.pos.x,-player.pos.y,-player.pos.z+player.eyeh);
 	glMatrixMode(GL_MODELVIEW);
-	//Clear the screen
-	glClear(GL_COLOR_BUFFER_BIT);
-	//SkyDraw();
-	glClear(GL_DEPTH_BUFFER_BIT);
 	//Draw everything
 	if(ticks%30==0){//Every so often run through and clean up the chunk list
 		Chunks.clear();
@@ -156,6 +162,7 @@ bool Game::Loop() {
 	return Window.IsOpened();
 }
 void Game::Unload() {
+	Done = true;
 	for(auto x=ChunkPos.begin();x!=ChunkPos.end();x++){
 		for(auto y=x->second.begin();y!=x->second.end();y++){
 			for(auto z=y->second.begin();z!=y->second.end();z++){
@@ -167,5 +174,4 @@ void Game::Unload() {
 		}
 	}
 	UnloadChunks();
-	Done = true;
 }

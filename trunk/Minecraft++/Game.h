@@ -9,4 +9,5 @@ namespace Game {
 	extern bool Done;
 	extern boost::thread Thread;
 	extern uint16_t Range;
+	extern bool Online;
 };

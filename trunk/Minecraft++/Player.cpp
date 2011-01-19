@@ -13,7 +13,7 @@ Player::Player() {
 	vy = 1;
 	vz = 1;
 	onground = 0;
-	accel = 0.004;
+	accel = 0.001;
 	gravity = 9.8;
 	speed = 8;
 	jump = 5.5;
@@ -478,27 +478,27 @@ void Player::EditBlocks(int button) {
 			}
 			if(button==2){
 				if(bd=="xp"){
-					GetBlock(bx+1,by,bz,ch)->type = 4;
+					GetBlock(bx+1,by,bz,ch)->type = Inv.Selected;
 					AddBlockUpdate(bx+1,by,bz,ch);
 				}
 				if(bd=="xn"){
-					GetBlock(bx-1,by,bz,ch)->type = 4;
+					GetBlock(bx-1,by,bz,ch)->type = Inv.Selected;
 					AddBlockUpdate(bx-1,by,bz,ch);
 				}
 				if(bd=="yp"){
-					GetBlock(bx,by+1,bz,ch)->type = 4;
+					GetBlock(bx,by+1,bz,ch)->type = Inv.Selected;
 					AddBlockUpdate(bx,by+1,bz,ch);
 				}
 				if(bd=="yn"){
-					GetBlock(bx,by-1,bz,ch)->type = 4;
+					GetBlock(bx,by-1,bz,ch)->type = Inv.Selected;
 					AddBlockUpdate(bx,by-1,bz,ch);
 				}
 				if(bd=="zp"){
-					GetBlock(bx,by,bz+1,ch)->type = 4;
+					GetBlock(bx,by,bz+1,ch)->type = Inv.Selected;
 					AddBlockUpdate(bx,by,bz+1,ch);
 				}
 				if(bd=="zn"){
-					GetBlock(bx,by,bz-1,ch)->type = 4;
+					GetBlock(bx,by,bz-1,ch)->type = Inv.Selected;
 					AddBlockUpdate(bx,by,bz-1,ch);
 				}
 			}
