@@ -25,6 +25,22 @@ Player::Player() {
 	Window.SetCursorPosition(Window.GetWidth()/2,Window.GetHeight()/2);
 }
 
+struct choice {
+		string type;
+		double value;
+		choice() {
+			type = "";
+			value = 0;
+		}
+		choice(string t, double v) {
+			type = t;
+			value = v;
+		}
+		bool operator() (const choice a, const choice b) {
+			return a.value>b.value;
+		}
+	};
+
 void Player::Step() {
 	if(!Game::Active){
 		return;
@@ -167,21 +183,6 @@ void Player::Step() {
 			dz = 0;
 		}
 		double ndis = dis;
-		struct choice {
-			string type;
-			double value;
-			choice() {
-				type = "";
-				value = 0;
-			}
-			choice(string t, double v) {
-				type = t;
-				value = v;
-			}
-			bool operator() (const choice a, const choice b) {
-				return a.value>b.value;
-			}
-		};
 		priority_queue<choice,vector<choice>,choice> choices;
 		choices.push(choice("x",dx));
 		choices.push(choice("y",dy));
@@ -347,21 +348,6 @@ void Player::EditBlocks(int button) {
 		} else {
 			dz = 0;
 		}
-		struct choice {
-			string type;
-			double value;
-			choice() {
-				type = "";
-				value = 0;
-			}
-			choice(string t, double v) {
-				type = t;
-				value = v;
-			}
-			bool operator() (const choice a, const choice b) {
-				return a.value>b.value;
-			}
-		};
 		priority_queue<choice,vector<choice>,choice> choices;
 		choices.push(choice("x",dx));
 		choices.push(choice("y",dy));
