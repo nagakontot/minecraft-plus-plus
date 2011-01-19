@@ -303,6 +303,8 @@
   <ItemGroup>
     <ClCompile Include="Blocks.cpp" />
     <ClCompile Include="Chunks.cpp" />
+    <ClCompile Include="Inventory.cpp" />
+    <ClCompile Include="Network.cpp" />
     <ClCompile Include="Sky.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Graphics.cpp" />
@@ -314,6 +316,8 @@
   <ItemGroup>
     <ClInclude Include="Blocks.h" />
     <ClInclude Include="Chunks.h" />
+    <ClInclude Include="Inventory.h" />
+    <ClInclude Include="Network.h" />
     <ClInclude Include="Sky.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Global.h" />

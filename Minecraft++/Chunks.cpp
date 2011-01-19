@@ -54,38 +54,40 @@ Chunk::Chunk(uint64_t _x, uint64_t _y, uint64_t _z) {
 }
 
 Chunk::~Chunk() {
-	auto it2 = find(ChunksToGen.begin(),ChunksToGen.end(),this);
-	if(it2!=ChunksToGen.end()){
-		ChunksToGen.erase(it2);
+	if(!Game::Done){
+		auto it2 = find(ChunksToGen.begin(),ChunksToGen.end(),this);
+		if(it2!=ChunksToGen.end()){
+			ChunksToGen.erase(it2);
+		}
+		auto it3 = find(ChunksToUpdate.begin(),ChunksToUpdate.end(),this);
+		if(it3!=ChunksToUpdate.end()){
+			ChunksToUpdate.erase(it3);
+		}
+		auto it4 = find(Chunks.begin(),Chunks.end(),this);
+		if(it4!=Chunks.end()){
+			Chunks.erase(it4);
+		}
+		ChunkPos[x][y][z] = 0;
+		if(xp!=0){
+			xp->xn = 0;
+		}
+		if(xn!=0){
+			xn->xp = 0;
+		}
+		if(yp!=0){
+			yp->yn = 0;
+		}
+		if(yn!=0){
+			yn->yp = 0;
+		}
+		if(zp!=0){
+			zp->zn = 0;
+		}
+		if(zn!=0){
+			zn->zp = 0;
+		}
+		glDeleteBuffers(1,&vbo);
 	}
-	auto it3 = find(ChunksToUpdate.begin(),ChunksToUpdate.end(),this);
-	if(it3!=ChunksToUpdate.end()){
-		ChunksToUpdate.erase(it3);
-	}
-	auto it4 = find(Chunks.begin(),Chunks.end(),this);
-	if(it4!=Chunks.end()){
-		Chunks.erase(it4);
-	}
-	ChunkPos[x][y][z] = 0;
-	if(xp!=0){
-		xp->xn = 0;
-	}
-	if(xn!=0){
-		xn->xp = 0;
-	}
-	if(yp!=0){
-		yp->yn = 0;
-	}
-	if(yn!=0){
-		yn->yp = 0;
-	}
-	if(zp!=0){
-		zp->zn = 0;
-	}
-	if(zn!=0){
-		zn->zp = 0;
-	}
-	glDeleteBuffers(1,&vbo);
 	if(modified){
 		ofstream file("save/"+tostring(x)+"."+tostring(y)+"."+tostring(z)+".imd", ios_base::binary);
 		file.write((char*)Blocks,32768);
