@@ -1,3 +1,6 @@
+Ports:
+Have yet to be decided
+
 Packets:
 All packets begin with 2 unsigned bytes indicating the packet type
 

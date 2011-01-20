@@ -35,6 +35,7 @@ bool Game::Init() {
 	srand(clock());
 	return true;
 }
+
 bool Game::Loop() {
 	//Event handling
 	sf::Event e;
@@ -78,6 +79,47 @@ bool Game::Loop() {
 		}
 	}
 	//Update stuff
+	if(ticks%30==0){//Every so often run through and clean up the chunk list
+		Chunks.clear();
+		for(uint8_t a=0;a<=Range*2;a++){
+			for(uint8_t b=0;b<=Range*2;b++){
+				for(uint8_t c=0;c<=Range*2;c++){
+					GetChunk(player.pos.cx+a-Range,player.pos.cy+b-Range,player.pos.cz+c-Range,true);
+				}
+			}
+		}
+		for(auto x=ChunkPos.begin();x!=ChunkPos.end();x){
+			for(auto y=x->second.begin();y!=x->second.end();y){
+				for(auto z=y->second.begin();z!=y->second.end();z){
+					Chunk* c=z->second;
+					if(c==0){
+						y->second.erase(z++);
+					} else {
+						double d = pdis(player.pos.cx,player.pos.cy,player.pos.cz,c->x,c->y,c->z);
+						if(d<Range){
+							if(c->verts>0){
+								Chunks.insert(c);
+							}
+						} else if(d>Range*2){
+							AddChunkUnload(c);
+						}
+						z++;
+					}
+				}
+				if(y->second.empty()){
+					x->second.erase(y++);
+				} else {
+					y++;
+				}
+			}
+			if(x->second.empty()){
+				ChunkPos.erase(x++);
+			} else {
+				x++;
+			}
+		}
+		sort(ChunksToGen.begin(),ChunksToGen.end(),ChunkComp);
+	}
 	player.Step();
 	GenChunks();
 	UpdateChunks();
@@ -96,34 +138,6 @@ bool Game::Loop() {
 	glTranslated(-player.pos.x,-player.pos.y,-player.pos.z+player.eyeh);
 	glMatrixMode(GL_MODELVIEW);
 	//Draw everything
-	if(ticks%30==0){//Every so often run through and clean up the chunk list
-		Chunks.clear();
-		for(uint8_t a=0;a<=Range*2;a++){
-			for(uint8_t b=0;b<=Range*2;b++){
-				for(uint8_t c=0;c<=Range*2;c++){
-					GetChunk(player.pos.cx+a-Range,player.pos.cy+b-Range,player.pos.cz+c-Range,true);
-				}
-			}
-		}
-		for(auto x=ChunkPos.begin();x!=ChunkPos.end();x++){
-			for(auto y=x->second.begin();y!=x->second.end();y++){
-				for(auto z=y->second.begin();z!=y->second.end();z++){
-					Chunk* c=z->second;
-					if(c!=0){
-						double d = pdis(player.pos.cx,player.pos.cy,player.pos.cz,c->x,c->y,c->z);
-						if(d<Range){
-							if(c->verts>0){
-								Chunks.insert(c);
-							}
-						} else if(d>Range*2){
-							AddChunkUnload(c);
-						}
-					}
-				}
-			}
-		}
-		sort(ChunksToGen.begin(),ChunksToGen.end(),ChunkComp);
-	}
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 	glBindTexture(GL_TEXTURE_3D,TEX);
@@ -134,8 +148,8 @@ bool Game::Loop() {
 	glBindBuffer(GL_ARRAY_BUFFER,0);
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-	glDisable(GL_DEPTH_TEST);
 	player.EditBlocks(mbut);
+	glDisable(GL_DEPTH_TEST);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	glOrtho(0,1,1,0,-1,1);

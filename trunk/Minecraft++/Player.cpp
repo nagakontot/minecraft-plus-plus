@@ -432,32 +432,46 @@ void Player::EditBlocks(int button) {
 		if(bo){
 			glLoadIdentity();
 			glTranslated(bx,by,bz);
-			glBegin(GL_LINES);
-			glVertex3f(0,0,0);
-			glVertex3f(1,0,0);
-			glVertex3f(0,0,0);
-			glVertex3f(0,1,0);
-			glVertex3f(0,0,0);
-			glVertex3f(0,0,1);
-			glVertex3f(1,0,0);
-			glVertex3f(1,1,0);
-			glVertex3f(1,0,0);
-			glVertex3f(1,0,1);
-			glVertex3f(0,1,0);
-			glVertex3f(1,1,0);
-			glVertex3f(0,1,0);
-			glVertex3f(0,1,1);
-			glVertex3f(0,0,1);
-			glVertex3f(1,0,1);
-			glVertex3f(0,0,1);
-			glVertex3f(0,1,1);
-			glVertex3f(1,1,0);
-			glVertex3f(1,1,1);
-			glVertex3f(1,0,1);
-			glVertex3f(1,1,1);
-			glVertex3f(0,1,1);
-			glVertex3f(1,1,1);
+			glColor4f(1,1,1,0.5);
+			glBegin(GL_QUADS);
+			if(bd=="xp"){
+				glVertex3f(1.001,0,0);
+				glVertex3f(1.001,1,0);
+				glVertex3f(1.001,1,1);
+				glVertex3f(1.001,0,1);
+			}
+			if(bd=="xn"){
+				glVertex3f(-0.001,0,0);
+				glVertex3f(-0.001,0,1);
+				glVertex3f(-0.001,1,1);
+				glVertex3f(-0.001,1,0);
+			}
+			if(bd=="yp"){
+				glVertex3f(0,1.001,0);
+				glVertex3f(0,1.001,1);
+				glVertex3f(1,1.001,1);
+				glVertex3f(1,1.001,0);
+			}
+			if(bd=="yn"){
+				glVertex3f(0,-0.001,0);
+				glVertex3f(1,-0.001,0);
+				glVertex3f(1,-0.001,1);
+				glVertex3f(0,-0.001,1);
+			}
+			if(bd=="zp"){
+				glVertex3f(0,0,1.001);
+				glVertex3f(1,0,1.001);
+				glVertex3f(1,1,1.001);
+				glVertex3f(0,1,1.001);
+			}
+			if(bd=="zn"){
+				glVertex3f(0,0,-0.001);
+				glVertex3f(0,1,-0.001);
+				glVertex3f(1,1,-0.001);
+				glVertex3f(1,0,-0.001);
+			}
 			glEnd();
+			glColor4f(1,1,1,1);
 			if(button==1){
 				bo->type = 0;
 				AddBlockUpdate(bx,by,bz,ch);
