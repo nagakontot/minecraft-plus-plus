@@ -264,8 +264,8 @@ void Chunk::Update() {
 								model[k] = M_XP[r]+a;
 								model[k+1] = M_XP[r+1]+b;
 								model[k+2] = M_XP[r+2]+c;
-								tex[k] = (15-b+T_QUAD[j*2])/16;
-								tex[k+1] = (c+T_QUAD[j*2+1])/16;
+								tex[k] = (7*a+15-b+T_QUAD[j*2])/16;
+								tex[k+1] = (7*a+c+T_QUAD[j*2+1])/16;
 								tex[k+2] = (GLfloat(t.tex[0])+0.5)/MAX_TEXTURES;
 								i++;
 							}
@@ -277,8 +277,8 @@ void Chunk::Update() {
 								model[k] = M_XN[r]+a;
 								model[k+1] = M_XN[r+1]+b;
 								model[k+2] = M_XN[r+2]+c;
-								tex[k] = (b+T_QUAD[j*2])/16;
-								tex[k+1] = (c+T_QUAD[j*2+1])/16;
+								tex[k] = (7*a+b+T_QUAD[j*2])/16;
+								tex[k+1] = (7*a+c+T_QUAD[j*2+1])/16;
 								tex[k+2] = (GLfloat(t.tex[1])+0.5)/MAX_TEXTURES;
 								i++;
 							}
@@ -290,8 +290,8 @@ void Chunk::Update() {
 								model[k] = M_YP[r]+a;
 								model[k+1] = M_YP[r+1]+b;
 								model[k+2] = M_YP[r+2]+c;
-								tex[k] = (a+T_QUAD[j*2])/16;
-								tex[k+1] = (c+T_QUAD[j*2+1])/16;
+								tex[k] = (7*b+a+T_QUAD[j*2])/16;
+								tex[k+1] = (7*b+c+T_QUAD[j*2+1])/16;
 								tex[k+2] = (GLfloat(t.tex[2])+0.5)/MAX_TEXTURES;
 								i++;
 							}
@@ -303,8 +303,8 @@ void Chunk::Update() {
 								model[k] = M_YN[r]+a;
 								model[k+1] = M_YN[r+1]+b;
 								model[k+2] = M_YN[r+2]+c;
-								tex[k] = (15-a+T_QUAD[j*2])/16;
-								tex[k+1] = (c+T_QUAD[j*2+1])/16;
+								tex[k] = (7*b+15-a+T_QUAD[j*2])/16;
+								tex[k+1] = (7*b+c+T_QUAD[j*2+1])/16;
 								tex[k+2] = (GLfloat(t.tex[3])+0.5)/MAX_TEXTURES;
 								i++;
 							}
@@ -316,8 +316,8 @@ void Chunk::Update() {
 								model[k] = M_ZP[r]+a;
 								model[k+1] = M_ZP[r+1]+b;
 								model[k+2] = M_ZP[r+2]+c;
-								tex[k] = (15-a+T_QUAD[j*2])/16;
-								tex[k+1] = (b+T_QUAD[j*2+1])/16;
+								tex[k] = (7*c+15-a+T_QUAD[j*2])/16;
+								tex[k+1] = (7*c+b+T_QUAD[j*2+1])/16;
 								tex[k+2] = (GLfloat(t.tex[4])+0.5)/MAX_TEXTURES;
 								i++;
 							}
@@ -329,8 +329,8 @@ void Chunk::Update() {
 								model[k] = M_ZN[r]+a;
 								model[k+1] = M_ZN[r+1]+b;
 								model[k+2] = M_ZN[r+2]+c;
-								tex[k] = (15-a+T_QUAD[j*2])/16;
-								tex[k+1] = (15-b+T_QUAD[j*2+1])/16;
+								tex[k] = (7*c+15-a+T_QUAD[j*2])/16;
+								tex[k+1] = (7*c+15-b+T_QUAD[j*2+1])/16;
 								tex[k+2] = (GLfloat(t.tex[5])+0.5)/MAX_TEXTURES;
 								i++;
 							}
