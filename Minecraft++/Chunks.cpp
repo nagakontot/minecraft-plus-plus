@@ -1,35 +1,8 @@
 #include "Global.h"
 
-noise::module::Perlin genhills;
-noise::module::RidgedMulti genmtns;
-noise::module::Perlin gentype;
-noise::module::Billow gencaves;
-
 uint16_t GenSpeed;
 
 void InitGen() {
-	genhills.SetFrequency(1.0/1024);
-	genhills.SetLacunarity(2);
-	genhills.SetNoiseQuality(noise::QUALITY_FAST);
-	genhills.SetOctaveCount(8);
-	genhills.SetPersistence(0.5);
-
-	genmtns.SetFrequency(1.0/2048);
-	genmtns.SetLacunarity(1.5);
-	genmtns.SetNoiseQuality(noise::QUALITY_FAST);
-	genmtns.SetOctaveCount(16);
-
-	gentype.SetFrequency(1.0/4096);
-	gentype.SetLacunarity(2);
-	gentype.SetNoiseQuality(noise::QUALITY_FAST);
-	gentype.SetOctaveCount(8);
-	gentype.SetPersistence(0.5);
-
-	gencaves.SetFrequency(1.0/100);
-	gencaves.SetLacunarity(2);
-	gencaves.SetNoiseQuality(noise::QUALITY_FAST);
-	gencaves.SetOctaveCount(3);
-	gencaves.SetPersistence(0.5);
 }
 
 Chunk::Chunk(uint64_t _x, uint64_t _y, uint64_t _z) {
@@ -95,6 +68,46 @@ Chunk::~Chunk() {
 	}
 }
 
+struct rand2d {
+public:
+	double nn, np, pn, pp;
+	uint64_t x, y;
+	rand2d(uint64_t x, uint64_t y, uint8_t depth, uint64_t type) {
+		this->x = x;
+		this->y = y;
+		uint64_t xt = x;
+		uint64_t yt = y;
+		nn = 0;
+		np = 0;
+		pn = 0;
+		pp = 0;
+		for(uint8_t i=0;i<depth;i++){
+			uint64_t inn, inp, ipn, ipp;
+			inn = random(xt,yt,type,i)>>(depth-i);
+			inp = random(xt,yt+1,type,i)>>(depth-i);
+			ipn = random(xt+1,yt,type,i)>>(depth-i);
+			ipp = random(xt+1,yt+1,type,i)>>(depth-i);
+			double xn = 1-double(x-(xt<<i))/(1<<i);
+			double yn = 1-double(y-(yt<<i))/(1<<i);
+			double xp = double(((xt+1)<<i)-x-1)/(1<<i);
+			double yp = double(((yt+1)<<i)-y-1)/(1<<i);
+			xn = xn*xn*(3-2*xn);
+			yn = yn*yn*(3-2*yn);
+			xp = xp*xp*(3-2*xp);
+			yp = yp*yp*(3-2*yp);
+			nn += (inn*xn*yn+inp*xn*(1-yn)+ipn*(1-xn)*yn+ipp*(1-xn)*(1-yn))/0x100000000;
+			np += (inn*xn*yp+inp*xn*(1-yp)+ipn*(1-xn)*yp+ipp*(1-xn)*(1-yp))/0x100000000;
+			pn += (inn*xp*yn+inp*xp*(1-yn)+ipn*(1-xp)*yn+ipp*(1-xp)*(1-yn))/0x100000000;
+			pp += (inn*xp*yp+inp*xp*(1-yp)+ipn*(1-xp)*yp+ipp*(1-xp)*(1-yp))/0x100000000;
+			xt >>= 1;
+			yt >>= 1;
+		}
+	}
+	double get(uint8_t bx, uint8_t by) {
+		return (nn*(16-bx)*(16-by)+np*(16-bx)*by+pn*bx*(16-by)+pp*bx*by)/256-0.5;
+	}
+};
+
 void Chunk::Generate() {
 	//Map generation goes here =D
 	ifstream file("save/"+tostring(x)+"."+tostring(y)+"."+tostring(z)+".imd", ios_base::binary);
@@ -102,48 +115,33 @@ void Chunk::Generate() {
 		file.read((char*)Blocks,32768);
 		file.close();
 	} else {
+		rand2d hill(x,y,8,0);
 		for(uint8_t a=0;a<16;a++){
-			double cx;
-			if(x/0x10000000%2==1){
-					cx = ((x&0xfffffff)<<4)+a;
-				} else {
-					cx = 0x100000000-(((x&0xfffffff)<<4)+a);
-				}
 			for(uint8_t b=0;b<16;b++){
-				double cy;
-				if(y/0x10000000%2==1){
-					cy = ((y&0xfffffff)<<4)+b;
-				} else {
-					cy = 0x100000000-(((y&0xfffffff)<<4)+b);
-				}
-				double hh = genhills.GetValue(cx,cy,0);
-				double hm = genmtns.GetValue(cx,cy,0);
-				double sel = gentype.GetValue(cx,cy,0);
-				int64_t r = max(0.0,sel)*hm*0x200+(1-abs(sel))*hh*0x80;
-				int64_t rz;
-				if(z>=INT64_MAX){
-					rz = z-INT64_MAX;
-				} else {
-					rz = -(INT64_MAX-z);
-				}
-				for(uint8_t c=0;c<16;c++){
-					double cz;
-					if(z/0x10000000%2==1){
-						cz = ((z&0xfffffff)<<4)+c;
-					} else {
-						cz = 0x100000000-(((z&0xfffffff)<<4)+c);
+				if(z>UINT64_HALF && z-UINT64_HALF>10000){
+					for(uint8_t c=0;c<16;c++){
+						Blocks[a*256+b*16+c].type = 2;
 					}
-					int64_t bz = rz*16+c;
-					int64_t d = bz-r;
-					uint16_t i = a*256+b*16+c;
-					if(d<0 || gencaves.GetValue(cx,cy,cz)+1<0){
-						Blocks[i].type = 0;
-					} else if(d>4){
-						Blocks[i].type = 2;
-					} else if(d>0){
-						Blocks[i].type = 1;
-					} else {
-						Blocks[i].type = 3;
+				} else if(z<UINT64_HALF && UINT64_HALF-z>10000){
+					for(uint8_t c=0;c<16;c++){
+						Blocks[a*256+b*16+c].type = 0;
+					}
+				} else {
+					int64_t h = hill.get(a,b)*1024;
+					int64_t dh = sdif(z,UINT64_HALF);
+					for(uint8_t c=0;c<16;c++){
+						int64_t bh = int8_t(c)+dh*16;
+						int64_t d = bh-h;
+						uint16_t i = a*256+b*16+c;
+						if(d<0){
+							Blocks[i].type = 0;
+						} else if(d>4){
+							Blocks[i].type = 2;
+						} else if(d>0){
+							Blocks[i].type = 1;
+						} else {
+							Blocks[i].type = 3;
+						}
 					}
 				}
 			}
@@ -211,30 +209,32 @@ void Chunk::Update() {
 		for(int b=0;b<16;b++){
 			for(int c=0;c<16;c++){
 				Block* bl = &Blocks[a*256+b*16+c];
-				bl->Update(a,b,c,this);
 				BlockType t = BlockTypes[bl->type];
-				if(bl->extra&1){
-					if(t.model==0 && t.tex!=0){
-						if(bl->extra&0x40){
-							verts += 4;
+				if(t.tex!=0){
+					bl->Update(a,b,c,this);
+					if(bl->extra&1){
+						if(t.model==0){
+							if(bl->extra&0x40){
+								verts += 4;
+							}
+							if(bl->extra&0x20){
+								verts += 4;
+							}
+							if(bl->extra&0x10){
+								verts += 4;
+							}
+							if(bl->extra&0x8){
+								verts += 4;
+							}
+							if(bl->extra&0x4){
+								verts += 4;
+							}
+							if(bl->extra&0x2){
+								verts += 4;
+							}
+						} else {
+							verts += BlockTypes[bl->type].verts;
 						}
-						if(bl->extra&0x20){
-							verts += 4;
-						}
-						if(bl->extra&0x10){
-							verts += 4;
-						}
-						if(bl->extra&0x8){
-							verts += 4;
-						}
-						if(bl->extra&0x4){
-							verts += 4;
-						}
-						if(bl->extra&0x2){
-							verts += 4;
-						}
-					} else {
-						verts += BlockTypes[bl->type].verts;
 					}
 				}
 			}

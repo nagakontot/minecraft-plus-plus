@@ -1,7 +1,9 @@
-Add different terrain type for map generation.
-Add water block to fill up low areas.
-Mining and placing of blocks. Something with octrees?
-Multiplayer server. Deal with this later when Alex gets enough experience.
-Saving and loading of chunks.
-Redo a bunch of stuff.
-Pay attention to my TODO list...
+Multiplayer
+	Determine networking library
+	Implement simple chunk loading saving and generating through the server
+Chunk Generation
+	Add stuff
+	Add different stone types
+Water
+	Fills regions below sea level but not caves
+	Flows

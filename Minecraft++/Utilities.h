@@ -71,6 +71,13 @@ const inline uint64_t dif(uint64_t a, uint64_t b){
 		return b-a;
 	}
 }
+const inline int64_t sdif(uint64_t a, uint64_t b){
+	if(a>b){
+		return int64_t(a-b);
+	} else {
+		return -int64_t(b-a);
+	}
+}
 const inline double pdis (double x1, double y1, double x2, double y2) {
 	return sqrt(sqr(x1-x2)+sqr(y1-y2));
 }

@@ -24,9 +24,6 @@ namespace bf = boost::filesystem;
 #include <SFML/Network.hpp>
 #include <SFML/Audio.hpp>
 
-//And other stuff too
-#include <noise/noise.h>
-
 //STL
 #include <iostream>
 #include <fstream>
