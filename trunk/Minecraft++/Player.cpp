@@ -13,7 +13,7 @@ Player::Player() {
 	vy = 1;
 	vz = 1;
 	onground = 0;
-	accel = 0.001;
+	accel = 0.0005;
 	gravity = 9.8;
 	speed = 8;
 	jump = 5.5;

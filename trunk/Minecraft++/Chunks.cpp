@@ -104,7 +104,65 @@ public:
 		}
 	}
 	double get(uint8_t bx, uint8_t by) {
-		return (nn*(16-bx)*(16-by)+np*(16-bx)*by+pn*bx*(16-by)+pp*bx*by)/256-0.5;
+		return (nn*(16-bx)*(16-by)+np*(16-bx)*by+pn*bx*(16-by)+pp*bx*by)/(16*16)-0.5;
+	}
+};
+struct rand3d {
+public:
+	double nnn, npn, pnn, ppn, nnp, npp, pnp, ppp;
+	uint64_t x, y, z;
+	rand3d(uint64_t x, uint64_t y, uint64_t z, uint8_t depth, uint64_t type) {
+		this->x = x;
+		this->y = y;
+		this->z = z;
+		uint64_t xt = x;
+		uint64_t yt = y;
+		uint64_t zt = z;
+		nnn = 0;
+		npn = 0;
+		pnn = 0;
+		ppn = 0;
+		nnp = 0;
+		npp = 0;
+		pnp = 0;
+		ppp = 0;
+		for(uint8_t i=0;i<depth;i++){
+			uint64_t innn, inpn, ipnn, ippn, innp, inpp, ipnp, ippp;
+			innn = random(xt,yt,zt,type,i)>>(depth-i);
+			inpn = random(xt,yt+1,zt,type,i)>>(depth-i);
+			ipnn = random(xt+1,yt,zt,type,i)>>(depth-i);
+			ippn = random(xt+1,yt+1,zt,type,i)>>(depth-i);
+			innp = random(xt,yt,zt+1,type,i)>>(depth-i);
+			inpp = random(xt,yt+1,zt+1,type,i)>>(depth-i);
+			ipnp = random(xt+1,yt,zt+1,type,i)>>(depth-i);
+			ippp = random(xt+1,yt+1,zt+1,type,i)>>(depth-i);
+			double xn = 1-double(x-(xt<<i))/(1<<i);
+			double yn = 1-double(y-(yt<<i))/(1<<i);
+			double zn = 1-double(z-(zt<<i))/(1<<i);
+			double xp = double(((xt+1)<<i)-x-1)/(1<<i);
+			double yp = double(((yt+1)<<i)-y-1)/(1<<i);
+			double zp = double(((zt+1)<<i)-z-1)/(1<<i);
+			xn = xn*xn*(3-2*xn);
+			yn = yn*yn*(3-2*yn);
+			zn = zn*zn*(3-2*zn);
+			xp = xp*xp*(3-2*xp);
+			yp = yp*yp*(3-2*yp);
+			zp = zp*zp*(3-2*zp);
+			nnn += (innn*xn*yn*zn+inpn*xn*(1-yn)*zn+ipnn*(1-xn)*yn*zn+ippn*(1-xn)*(1-yn)*zn+innp*xn*yn*(1-zn)+inpp*xn*(1-yn)*(1-zn)+ipnp*(1-xn)*yn*(1-zn)+ippp*(1-xn)*(1-yn)*(1-zn))/0x100000000;
+			npn += (innn*xn*yp*zn+inpn*xn*(1-yp)*zn+ipnn*(1-xn)*yp*zn+ippn*(1-xn)*(1-yp)*zn+innp*xn*yp*(1-zn)+inpp*xn*(1-yp)*(1-zn)+ipnp*(1-xn)*yp*(1-zn)+ippp*(1-xn)*(1-yp)*(1-zn))/0x100000000;
+			pnn += (innn*xp*yn*zn+inpn*xp*(1-yn)*zn+ipnn*(1-xp)*yn*zn+ippn*(1-xp)*(1-yn)*zn+innp*xp*yn*(1-zn)+inpp*xp*(1-yn)*(1-zn)+ipnp*(1-xp)*yn*(1-zn)+ippp*(1-xp)*(1-yn)*(1-zn))/0x100000000;
+			ppn += (innn*xp*yp*zn+inpn*xp*(1-yp)*zn+ipnn*(1-xp)*yp*zn+ippn*(1-xp)*(1-yp)*zn+innp*xp*yp*(1-zn)+inpp*xp*(1-yp)*(1-zn)+ipnp*(1-xp)*yp*(1-zn)+ippp*(1-xp)*(1-yp)*(1-zn))/0x100000000;
+			nnp += (innn*xn*yn*zp+inpn*xn*(1-yn)*zp+ipnn*(1-xn)*yn*zp+ippn*(1-xn)*(1-yn)*zp+innp*xn*yn*(1-zp)+inpp*xn*(1-yn)*(1-zp)+ipnp*(1-xn)*yn*(1-zp)+ippp*(1-xn)*(1-yn)*(1-zp))/0x100000000;
+			npp += (innn*xn*yp*zp+inpn*xn*(1-yp)*zp+ipnn*(1-xn)*yp*zp+ippn*(1-xn)*(1-yp)*zp+innp*xn*yp*(1-zp)+inpp*xn*(1-yp)*(1-zp)+ipnp*(1-xn)*yp*(1-zp)+ippp*(1-xn)*(1-yp)*(1-zp))/0x100000000;
+			pnp += (innn*xp*yn*zp+inpn*xp*(1-yn)*zp+ipnn*(1-xp)*yn*zp+ippn*(1-xp)*(1-yn)*zp+innp*xp*yn*(1-zp)+inpp*xp*(1-yn)*(1-zp)+ipnp*(1-xp)*yn*(1-zp)+ippp*(1-xp)*(1-yn)*(1-zp))/0x100000000;
+			ppp += (innn*xp*yp*zp+inpn*xp*(1-yp)*zp+ipnn*(1-xp)*yp*zp+ippn*(1-xp)*(1-yp)*zp+innp*xp*yp*(1-zp)+inpp*xp*(1-yp)*(1-zp)+ipnp*(1-xp)*yp*(1-zp)+ippp*(1-xp)*(1-yp)*(1-zp))/0x100000000;
+			xt >>= 1;
+			yt >>= 1;
+			zt >>= 1;
+		}
+	}
+	double get(uint8_t bx, uint8_t by, uint8_t bz) {
+		return (nnn*(16-bx)*(16-by)*(16-bz)+npn*(16-bx)*by*(16-bz)+pnn*bx*(16-by)*(16-bz)+ppn*bx*by*(16-bz)+nnp*(16-bx)*(16-by)*bz+npp*(16-bx)*by*bz+pnp*bx*(16-by)*bz+ppp*bx*by*bz)/(16*16*16)-0.5;
 	}
 };
 
@@ -116,6 +174,8 @@ void Chunk::Generate() {
 		file.close();
 	} else {
 		rand2d hill(x,y,8,0);
+		rand3d cave(x,y,z,4,1);
+		rand3d strange(x,y,z,2,2);
 		for(uint8_t a=0;a<16;a++){
 			for(uint8_t b=0;b<16;b++){
 				if(z>UINT64_HALF && z-UINT64_HALF>10000){
@@ -127,13 +187,15 @@ void Chunk::Generate() {
 						Blocks[a*256+b*16+c].type = 0;
 					}
 				} else {
-					int64_t h = hill.get(a,b)*1024;
+					double hf = hill.get(a,b);
 					int64_t dh = sdif(z,UINT64_HALF);
 					for(uint8_t c=0;c<16;c++){
+						double hc = hf+strange.get(a,b,c)*0.2;
+						int64_t h = hc*1024;
 						int64_t bh = int8_t(c)+dh*16;
 						int64_t d = bh-h;
 						uint16_t i = a*256+b*16+c;
-						if(d<0){
+						if(d<0 || abs(cave.get(a,b,c))<0.01){
 							Blocks[i].type = 0;
 						} else if(d>4){
 							Blocks[i].type = 2;
@@ -467,11 +529,22 @@ void GenChunks() {
 }
 
 void UnloadChunks() {
-	while(!ChunksToUnload.empty()){
-		auto it = ChunksToUnload.begin();
-		Chunk* c = *it;
-		ChunksToUnload.erase(it);
-		delete c;
+	if(Game::Done){
+		for(auto it=ChunksToUnload.begin();it!=ChunksToUnload.end();it++){
+			Chunk* c = *it;
+			if(c->modified){
+				ofstream file("save/"+tostring(c->x)+"."+tostring(c->y)+"."+tostring(c->z)+".imd", ios_base::binary);
+				file.write((char*)c->Blocks,32768);
+				file.close();
+			}
+		}
+	} else {
+		while(!ChunksToUnload.empty()){
+			auto it = ChunksToUnload.begin();
+			Chunk* c = *it;
+			ChunksToUnload.erase(it);
+			delete c;
+		}
 	}
 }
 
