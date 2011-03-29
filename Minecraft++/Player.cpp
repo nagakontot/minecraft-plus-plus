@@ -100,11 +100,24 @@ void Player::Step() {
 		}
 		safespot = true;
 	}
+	bool kup = input.IsKeyDown(sf::Key::Q);
+	bool kdown = input.IsKeyDown(sf::Key::E);
 	bool kw = input.IsKeyDown(sf::Key::W);
 	bool ka = input.IsKeyDown(sf::Key::A);
 	bool ks = input.IsKeyDown(sf::Key::S);
 	bool kd = input.IsKeyDown(sf::Key::D);
 	double d = pow(accel,delta);
+
+	if(kup)
+	{
+		gravity = 0;
+		pos.z-=1;
+	}
+	if(kdown)
+	{
+		gravity = 9.8;
+		pos.z+=1;
+	}
 	if(kw){
 		vx = (vx-ldx(speed,rot.d))*d+ldx(speed,rot.d);
 		vy = (vy-ldy(speed,rot.d))*d+ldy(speed,rot.d);
@@ -127,6 +140,7 @@ void Player::Step() {
 	}
 	if(input.IsKeyDown(sf::Key::Space) && onground){
 		vz = -jump;
+		flying=false;
 	}
 	Chunk* ch = GetChunk(pos.cx,pos.cy,pos.cz);
 	if(ch==0 || ch->generated==false){
@@ -148,6 +162,8 @@ void Player::Step() {
 	double dxy = pdir(0,0,rx,ry);
 	double dyz = pdir(0,0,ry,rz);
 	double dzx = pdir(0,0,rz,rx);
+
+
 	while(dis>0){
 		bool finished = false;
 		rx = vx*delta;
@@ -279,7 +295,7 @@ void Player::Step() {
 									goto done;
 								}
 								vz = 0;
-								pos.z = nz+1.0001+height;
+										pos.z = nz+1.0001+height;
 							}
 							pos.x += rx/tdis*c.value;
 							pos.y += ry/tdis*c.value;
@@ -302,6 +318,7 @@ void Player::Step() {
 		continue;
 	}
 	pos.Update();
+
 }
 
 void Player::EditBlocks(int button) {

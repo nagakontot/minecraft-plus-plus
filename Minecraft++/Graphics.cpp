@@ -11,9 +11,10 @@ void AddTex(GLuint z, string name) {
 }
 
 void InitGraphics() {
+	GLfloat fog_color[] = {1.0f, 0.5f, 1.0f, 1.0f};
 	glewInit();
 	glClearColor(0.3,0.6,1,1);
-	glEnable(GL_DEPTH_TEST);
+	//glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LEQUAL);
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_TEXTURE_3D);
