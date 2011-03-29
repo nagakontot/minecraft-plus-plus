@@ -31,6 +31,7 @@ bool Game::Init() {
 	Window.ShowMouseCursor(false);
 	//Window.SetFramerateLimit(30);
 	InitGraphics();
+	initInterface();
 	Window.SetActive();
 	srand(clock());
 	return true;
@@ -141,6 +142,7 @@ bool Game::Loop() {
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 	glBindTexture(GL_TEXTURE_3D,TEX);
+
 	for(auto i=Chunks.begin(); i!=Chunks.end(); i++){
 		(*i)->Draw();
 	}
@@ -157,12 +159,12 @@ bool Game::Loop() {
 	glLoadIdentity();
 	//Draw the interface
 	glBegin(GL_LINES);
-	glVertex2f(0.49,0.5);
-	glVertex2f(0.51,0.5);
-	glVertex2f(0.5,0.49);
-	glVertex2f(0.5,0.51);
+		glVertex2f(0.49,0.5);
+		glVertex2f(0.51,0.5);
+		glVertex2f(0.5,0.49);
+		glVertex2f(0.5,0.51);
 	glEnd();
-	glEnable(GL_DEPTH_TEST);
+	drawInterface();
 	//Display the screen
 	Window.Display();
 	fps = fps*0.8+0.2/Window.GetFrameTime();
