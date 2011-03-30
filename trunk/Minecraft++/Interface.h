@@ -1,0 +1,4 @@
+void initInterface();
+void drawInterface();
+
+
