@@ -173,9 +173,9 @@ void Chunk::Generate() {
 		file.read((char*)Blocks,32768);
 		file.close();
 	} else {
-		rand2d hill(x,y,1,0);
-		rand3d cave(x,y,z,0,0);
-		rand3d strange(x,y,z,1,2);
+		rand2d hill(x,y,8,0);
+		rand3d cave(x,y,z,4,1);
+		rand3d strange(x,y,z,2,2);
 		for(uint8_t a=0;a<16;a++){
 			for(uint8_t b=0;b<16;b++){
 				if(z>UINT64_HALF && z-UINT64_HALF>10000){
