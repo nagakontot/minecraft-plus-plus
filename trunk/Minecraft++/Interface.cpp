@@ -10,11 +10,11 @@ void loadTexture( const char* filename)
 	}
     glGenTextures(1, &texturelol);
     glBindTexture(GL_TEXTURE_2D, texturelol);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, TEXTURE_SIZE, TEXTURE_SIZE, 0, GL_RGBA, GL_UNSIGNED_BYTE, image->GetPixelsPtr());
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, TEXTURE_SIZE, TEXTURE_SIZE, 0, GL_RGBA, GL_UNSIGNED_BYTE, image->GetPixelsPtr());
 	glBindTexture(GL_TEXTURE_2D, 0);
 	free(image);
 	cout << glGetError() <<endl;
@@ -22,7 +22,7 @@ void loadTexture( const char* filename)
 void initInterface()
 {
 	glEnable(GL_TEXTURE_2D);
-	loadTexture("textures/grass_side.png");
+	texturelol = GetTexture("textures/grass_side.png");
 
 }
 
