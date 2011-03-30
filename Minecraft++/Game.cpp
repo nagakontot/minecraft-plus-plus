@@ -164,6 +164,7 @@ bool Game::Loop() {
 		glVertex2f(0.5,0.49);
 		glVertex2f(0.5,0.51);
 	glEnd();
+	glEnable(GL_DEPTH_TEST);
 	drawInterface();
 	//Display the screen
 	Window.Display();
